@@ -9,6 +9,9 @@ import java.util.stream.Stream;
 public class Pip {
     private static final String python = Loader.load(org.bytedeco.cpython.python.class);
 
+    private Pip() {
+    }
+
     public static synchronized int install(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "install"}, packages));
     }

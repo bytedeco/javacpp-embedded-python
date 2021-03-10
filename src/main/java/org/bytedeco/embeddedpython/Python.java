@@ -42,6 +42,9 @@ public class Python {
     private static final PyObject mainModule = PyImport_AddModule("__main__");
     private static final PyObject globals = PyModule_GetDict(mainModule);
 
+    private Python() {
+    }
+
     public synchronized static void clear() {
         PyDict_Clear(globals);
     }
