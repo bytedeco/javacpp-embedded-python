@@ -1,5 +1,7 @@
 package org.bytedeco.embeddedpython;
 
+import java.util.Arrays;
+
 public class NpNdarrayLong extends NpNdarray {
     public static final long serialVersionUID = 1L;
     public final long[] data;
@@ -8,6 +10,24 @@ public class NpNdarrayLong extends NpNdarray {
         super(dimensions, strides, 8);
         if (data == null) throw new NullPointerException("data = null");
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NpNdarrayLong)) return false;
+        if (!super.equals(o)) return false;
+
+        NpNdarrayLong that = (NpNdarrayLong) o;
+
+        return Arrays.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(data);
+        return result;
     }
 
     public long[] toArray() {

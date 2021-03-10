@@ -35,6 +35,26 @@ public abstract class NpNdarray implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NpNdarray)) return false;
+
+        NpNdarray npNdarray = (NpNdarray) o;
+
+        if (itemsize != npNdarray.itemsize) return false;
+        if (!Arrays.equals(dimensions, npNdarray.dimensions)) return false;
+        return Arrays.equals(strides, npNdarray.strides);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(dimensions);
+        result = 31 * result + Arrays.hashCode(strides);
+        result = 31 * result + itemsize;
+        return result;
+    }
+
     int[] indexStrides() {
         return Arrays.stream(strides).map(s -> s / itemsize).toArray();
     }
