@@ -1,6 +1,7 @@
 package org.bytedeco.embeddedpython;
 
 public class NpNdarrayByte extends NpNdarray {
+    public static final long serialVersionUID = 1L;
     public final byte[] data;
 
     public NpNdarrayByte(byte[] data, int[] dimensions, int[] strides) {
