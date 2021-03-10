@@ -8,7 +8,31 @@
     <artifactId>javacpp-embedded-python</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <name>javacpp-embedded-python</name>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Yu Kobayashi</name>
+            <email>yukoba@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/bytedeco/javacpp-embedded-python</url>
+        <connection>scm:git:git://github.com/bytedeco/javacpp-embedded-python.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/bytedeco/javacpp-embedded-python.git</developerConnection>
+    </scm>
+
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
@@ -39,4 +63,78 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <packagingTypes>
+                        <packagingType>jar</packagingType>
+                    </packagingTypes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-descriptor</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-source</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <links>
+                                <link>http://maven.apache.org/ref/3.5.4/maven-plugin-api/apidocs</link>
+                                <link>http://maven.apache.org/plugin-tools/maven-plugin-annotations/apidocs</link>
+                                <link>http://maven.apache.org/ref/3.0/maven-core/apidocs</link>
+                                <link>http://www.slf4j.org/apidocs</link>
+                                <link>http://junit.org/junit4/javadoc/4.13.1</link>
+                            </links>
+                            <show>protected</show>
+                            <tagletArtifacts>
+                                <tagletArtifact>
+                                    <groupId>org.apache.maven.plugin-tools</groupId>
+                                    <artifactId>maven-plugin-tools-javadoc</artifactId>
+                                    <version>3.5.2</version>
+                                </tagletArtifact>
+                            </tagletArtifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
