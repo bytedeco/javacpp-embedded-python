@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 public abstract class NpNdarray implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public final int ndim;
     public final int[] dimensions;

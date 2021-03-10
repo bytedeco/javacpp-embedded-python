@@ -3,7 +3,7 @@ package org.bytedeco.embeddedpython;
 import java.util.Arrays;
 
 public class NpNdarrayDouble extends NpNdarray {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     public final double[] data;
 
     public NpNdarrayDouble(double[] data, int[] dimensions, int[] strides) {
