@@ -6,20 +6,32 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+/**
+ * Pip.
+ */
 public class Pip {
     private static final String python = Loader.load(org.bytedeco.cpython.python.class);
 
     private Pip() {
     }
 
+    /**
+     * Install pip packages.
+     */
     public static synchronized int install(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "install"}, packages));
     }
 
+    /**
+     * Upgrade pip packages.
+     */
     public static synchronized int upgrade(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "install", "--upgrade"}, packages));
     }
 
+    /**
+     * Uninstall pip packages.
+     */
     public static synchronized int uninstall(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "uninstall"}, packages));
     }

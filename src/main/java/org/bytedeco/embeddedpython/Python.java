@@ -23,6 +23,14 @@ import static org.bytedeco.cpython.helper.python.Py_AddPath;
 import static org.bytedeco.cpython.presets.python.cachePackages;
 import static org.bytedeco.numpy.global.numpy.*;
 
+/**
+ * Python interpreter.
+ * <p>
+ * If you embed two Python, many Python libraries do not work correctly.
+ * Therefore this class is a singleton class. All the methods are static.
+ * <p>
+ * This class is thread-safe. All the methods are synchronized.
+ */
 public class Python {
     static {
         try {
@@ -50,6 +58,9 @@ public class Python {
     private Python() {
     }
 
+    /**
+     * Delete all the global variables.
+     */
     public synchronized static void clear() {
         PyDict_Clear(globals);
     }
@@ -65,6 +76,11 @@ public class Python {
         return co;
     }
 
+    /**
+     * Python built-in eval().
+     *
+     * @param src Python code. This must be a single line code.
+     */
     public synchronized static <T> T eval(String src) {
         PyObject co = compile(src);
         try {
@@ -86,12 +102,24 @@ public class Python {
         }
     }
 
+    /**
+     * Python built-in exec().
+     *
+     * @param src Python code. This can be multiple lines code.
+     */
     public synchronized static void exec(String src) {
         if (PyRun_SimpleStringFlags(src, null) != 0) {
             throw new PythonException("PyRun_SimpleStringFlags() failed. src = " + src);
         }
     }
 
+    /**
+     * Get the global Python variable and convert it to Java object.
+     *
+     * @param name The variable name
+     * @throws PythonException        If the value cannot convert to a Java object.
+     * @throws NoSuchElementException If the variable does not exists.
+     */
     public synchronized static <T> T get(String name) {
         //noinspection unchecked
         return (T) toJava(getPyObject(name));
@@ -103,6 +131,13 @@ public class Python {
         return obj;
     }
 
+    /**
+     * Convert the Java object and set it to the global Python variable.
+     *
+     * @param name  The variable name
+     * @param value The value to put.
+     * @throws PythonException If the value cannot convert to a Python object.
+     */
     public synchronized static void put(String name, Object value) {
         putPyObject(name, toPyObject(value));
     }
