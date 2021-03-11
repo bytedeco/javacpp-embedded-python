@@ -40,12 +40,6 @@
     <dependencies>
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>cpython-platform</artifactId>
-            <version>3.9.2-1.5.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bytedeco</groupId>
             <artifactId>numpy-platform</artifactId>
             <version>1.20.1-1.5.5</version>
         </dependency>
