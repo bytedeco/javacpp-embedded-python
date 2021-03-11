@@ -4,10 +4,13 @@ import org.bytedeco.cpython.PyCFunction;
 import org.bytedeco.cpython.PyMethodDef;
 import org.bytedeco.cpython.PyObject;
 import org.bytedeco.cpython.PyTypeObject;
+import org.bytedeco.cpython.global.python;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.numpy.*;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +40,8 @@ public class Python {
 
         Py_Initialize();
         _import_array();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(python::Py_Finalize));
     }
 
     private static final PyObject mainModule = PyImport_AddModule("__main__");
@@ -409,11 +414,23 @@ public class Python {
         PyCFunction pyFunc = new PyCFunction() {
             @Override
             public PyObject call(PyObject self, PyObject args) {
-                Object[] objs = new Object[(int) PyTuple_Size(args)];
-                for (int i = 0; i < objs.length; i++) {
-                    objs[i] = toJava(PyTuple_GetItem(args, i));
+                try {
+                    Object[] objs = new Object[(int) PyTuple_Size(args)];
+                    for (int i = 0; i < objs.length; i++) {
+                        objs[i] = toJava(PyTuple_GetItem(args, i));
+                    }
+                    return toPyObject(fn.apply(objs));
+                } catch (Throwable e) {
+                    e.printStackTrace();
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw, true);
+                    e.printStackTrace(pw);
+                    String msg = sw.getBuffer().toString();
+                    PyErr_SetString(PyExc_RuntimeError(), msg);
+
+                    return null;
                 }
-                return toPyObject(fn.apply(objs));
             }
         };
         PyMethodDef methodDef = new PyMethodDef().ml_meth(pyFunc).ml_flags(METH_VARARGS);

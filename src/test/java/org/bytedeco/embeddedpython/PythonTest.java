@@ -6,6 +6,7 @@ import scala.Function2;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PythonTest {
     @Test
@@ -76,5 +77,20 @@ public class PythonTest {
     public void testException() {
         Python.clear();
         Python.eval("a + 1");
+    }
+
+    @Test
+    public void testLambdaException() {
+        Python.put("f", (Function2<Long, Long, Long>) (a, b) -> {
+            throw new RuntimeException("From lambda");
+        });
+        Python.exec("try:\n" +
+                "   f(1, 2)\n" +
+                "   v = Flase\n" +
+                "except RuntimeError as e:\n" +
+                "   print(e)\n" +
+                "   v = True\n");
+        boolean v = Python.get("v");
+        assertTrue(v);
     }
 }
