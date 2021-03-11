@@ -66,6 +66,9 @@ public class Python {
             PyObject obj = PyEval_EvalCode(co, globals, globals);
             try {
                 if (obj == null) {
+                    if (PyErr_Occurred() != null) {
+                        PyErr_Print();
+                    }
                     throw new PythonException("PyEval_EvalCode() failed. An Error is thrown inside Python. src = " + src);
                 }
                 //noinspection unchecked

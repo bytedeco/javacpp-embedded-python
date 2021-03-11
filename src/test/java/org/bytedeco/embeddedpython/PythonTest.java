@@ -71,4 +71,10 @@ public class PythonTest {
         assertEquals(4, ary3[0][0].length);
         assertEquals(17, ary3[1][1][1]);
     }
+
+    @Test(expected = PythonException.class)
+    public void testException() {
+        Python.clear();
+        Python.eval("a + 1");
+    }
 }
