@@ -31,7 +31,7 @@ public class NpNdarrayInt extends NpNdarray {
     }
 
     public int[] toArray() {
-        if (ndim != 1) throw new RuntimeException("ndim != 1");
+        if (ndim() != 1) throw new RuntimeException("ndim != 1");
 
         if (strides[0] == itemsize && data.length == dimensions[0]) {
             return data;
@@ -46,7 +46,7 @@ public class NpNdarrayInt extends NpNdarray {
     }
 
     public int[][] toArray2d() {
-        if (ndim != 2) throw new RuntimeException("ndim != 2");
+        if (ndim() != 2) throw new RuntimeException("ndim != 2");
 
         int[] indexStrides = indexStrides();
         int[][] ary = new int[dimensions[0]][dimensions[1]];
@@ -59,7 +59,7 @@ public class NpNdarrayInt extends NpNdarray {
     }
 
     public int[][][] toArray3d() {
-        if (ndim != 3) throw new RuntimeException("ndim != 3");
+        if (ndim() != 3) throw new RuntimeException("ndim != 3");
 
         int[] indexStrides = indexStrides();
         int[][][] ary = new int[dimensions[0]][dimensions[1]][dimensions[2]];

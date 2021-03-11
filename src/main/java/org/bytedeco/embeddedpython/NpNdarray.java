@@ -6,7 +6,6 @@ import java.util.Arrays;
 public abstract class NpNdarray implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public final int ndim;
     public final int[] dimensions;
     public final int[] strides;
     public final int itemsize;
@@ -19,16 +18,21 @@ public abstract class NpNdarray implements Serializable {
         if (itemsize <= 0)
             throw new IllegalArgumentException("itemsize = " + itemsize);
 
-        this.ndim = dimensions.length;
         this.dimensions = dimensions;
         this.strides = strides;
         this.itemsize = itemsize;
     }
 
+    /**
+     * The length of dimensions.
+     */
+    public int ndim() {
+        return dimensions.length;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                "ndim=" + ndim +
                 ", dimensions=" + Arrays.toString(dimensions) +
                 ", strides=" + Arrays.toString(strides) +
                 ", itemsize=" + itemsize +
