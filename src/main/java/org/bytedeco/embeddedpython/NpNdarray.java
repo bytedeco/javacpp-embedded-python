@@ -8,19 +8,15 @@ public abstract class NpNdarray implements Serializable {
 
     public final int[] dimensions;
     public final int[] strides;
-    public final int itemsize;
 
-    public NpNdarray(int[] dimensions, int[] strides, int itemsize) {
+    public NpNdarray(int[] dimensions, int[] strides) {
         if (dimensions.length != strides.length)
             throw new IllegalArgumentException(
                     "dimensions.length = " + dimensions.length +
                     ", strides.length = " + strides.length);
-        if (itemsize <= 0)
-            throw new IllegalArgumentException("itemsize = " + itemsize);
 
         this.dimensions = dimensions;
         this.strides = strides;
-        this.itemsize = itemsize;
     }
 
     /**
@@ -30,12 +26,16 @@ public abstract class NpNdarray implements Serializable {
         return dimensions.length;
     }
 
+    /**
+     * The bytes of element.
+     */
+    public abstract int itemsize();
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
                 ", dimensions=" + Arrays.toString(dimensions) +
                 ", strides=" + Arrays.toString(strides) +
-                ", itemsize=" + itemsize +
                 '}';
     }
 
@@ -46,7 +46,6 @@ public abstract class NpNdarray implements Serializable {
 
         NpNdarray npNdarray = (NpNdarray) o;
 
-        if (itemsize != npNdarray.itemsize) return false;
         if (!Arrays.equals(dimensions, npNdarray.dimensions)) return false;
         return Arrays.equals(strides, npNdarray.strides);
     }
@@ -55,12 +54,11 @@ public abstract class NpNdarray implements Serializable {
     public int hashCode() {
         int result = Arrays.hashCode(dimensions);
         result = 31 * result + Arrays.hashCode(strides);
-        result = 31 * result + itemsize;
         return result;
     }
 
     int[] indexStrides() {
-        return Arrays.stream(strides).map(s -> s / itemsize).toArray();
+        return Arrays.stream(strides).map(s -> s / itemsize()).toArray();
     }
 }
 

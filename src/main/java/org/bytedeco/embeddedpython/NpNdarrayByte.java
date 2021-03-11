@@ -7,9 +7,17 @@ public class NpNdarrayByte extends NpNdarray {
     public final byte[] data;
 
     public NpNdarrayByte(byte[] data, int[] dimensions, int[] strides) {
-        super(dimensions, strides, 1);
+        super(dimensions, strides);
         if (data == null) throw new NullPointerException("data = null");
         this.data = data;
+    }
+
+    /**
+     * The bytes of element.
+     */
+    @Override
+    public int itemsize() {
+        return 1;
     }
 
     @Override
@@ -33,7 +41,7 @@ public class NpNdarrayByte extends NpNdarray {
     public byte[] toArray() {
         if (ndim() != 1) throw new RuntimeException("ndim != 1");
 
-        if (strides[0] == itemsize && data.length == dimensions[0]) {
+        if (strides[0] == itemsize() && data.length == dimensions[0]) {
             return data;
         } else {
             int[] indexStrides = indexStrides();
