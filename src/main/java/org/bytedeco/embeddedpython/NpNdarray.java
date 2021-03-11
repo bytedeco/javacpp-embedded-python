@@ -22,7 +22,7 @@ public abstract class NpNdarray implements Serializable {
         if (dimensions.length != strides.length)
             throw new IllegalArgumentException(
                     "dimensions.length = " + dimensions.length +
-                    ", strides.length = " + strides.length);
+                            ", strides.length = " + strides.length);
 
         this.dimensions = dimensions;
         this.strides = strides;

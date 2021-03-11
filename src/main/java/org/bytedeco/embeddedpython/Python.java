@@ -211,49 +211,57 @@ public class Python {
             switch ((int) aryObj.descr().type()) {
                 case NPY_BYTELTR: {
                     BytePointer dataPtr = new BytePointer(PyArray_BYTES(aryObj));
-                    byte[] data = new byte[(int) PyArray_Size(aryObj)];
+                    byte[] data = new byte[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayByte(data, toIntArray(dimensions), toIntArray(strides));
                 }
                 case NPY_USHORTLTR: {
                     CharPointer dataPtr = new CharPointer(PyArray_BYTES(aryObj));
-                    char[] data = new char[(int) PyArray_Size(aryObj)];
+                    char[] data = new char[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayChar(data, toIntArray(dimensions), toIntArrayDiv(strides, 2));
                 }
                 case NPY_SHORTLTR: {
                     ShortPointer dataPtr = new ShortPointer(PyArray_BYTES(aryObj));
-                    short[] data = new short[(int) PyArray_Size(aryObj)];
+                    short[] data = new short[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayShort(data, toIntArray(dimensions), toIntArrayDiv(strides, 2));
                 }
                 case NPY_INTLTR: {
                     IntPointer dataPtr = new IntPointer(PyArray_BYTES(aryObj));
-                    int[] data = new int[(int) PyArray_Size(aryObj)];
+                    int[] data = new int[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayInt(data, toIntArray(dimensions), toIntArrayDiv(strides, 4));
                 }
                 case NPY_LONGLTR: {
                     CLongPointer dataPtr = new CLongPointer(PyArray_BYTES(aryObj));
-                    long[] data = new long[(int) PyArray_Size(aryObj)];
+                    long[] data = new long[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayLong(data, toIntArray(dimensions), toIntArrayDiv(strides, 8));
                 }
                 case NPY_FLOATLTR: {
                     FloatPointer dataPtr = new FloatPointer(PyArray_BYTES(aryObj));
-                    float[] data = new float[(int) PyArray_Size(aryObj)];
+                    float[] data = new float[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayFloat(data, toIntArray(dimensions), toIntArrayDiv(strides, 4));
                 }
                 case NPY_DOUBLELTR: {
                     DoublePointer dataPtr = new DoublePointer(PyArray_BYTES(aryObj));
-                    double[] data = new double[(int) PyArray_Size(aryObj)];
+                    double[] data = new double[pyArraySize(aryObj)];
                     dataPtr.get(data);
                     return new NpNdarrayDouble(data, toIntArray(dimensions), toIntArrayDiv(strides, 8));
                 }
             }
         }
         throw new PythonException("Unsupported Python type");
+    }
+
+    private static int pyArraySize(PyArrayObject aryObj) {
+        long s = PyArray_Size(aryObj);
+        if (s > Integer.MAX_VALUE) {
+            throw new PythonException("Cannot convert np.ndarray because the length is larger than 2G");
+        }
+        return (int) s;
     }
 
     /**
