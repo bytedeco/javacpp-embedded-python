@@ -209,6 +209,12 @@ public class Python {
             stridesPtr.get(strides);
 
             switch ((int) aryObj.descr().type()) {
+                case NPY_BOOLLTR: {
+                    BooleanPointer dataPtr = new BooleanPointer(PyArray_BYTES(aryObj));
+                    boolean[] data = new boolean[pyArraySize(aryObj)];
+                    dataPtr.get(data);
+                    return new NpNdarrayBoolean(data, toIntArray(dimensions), toIntArray(strides));
+                }
                 case NPY_BYTELTR: {
                     BytePointer dataPtr = new BytePointer(PyArray_BYTES(aryObj));
                     byte[] data = new byte[pyArraySize(aryObj)];
@@ -291,6 +297,11 @@ public class Python {
         } else if (value instanceof byte[]) {
             byte[] ary = (byte[]) value;
             return PyBytes_FromStringAndSize(new BytePointer(ary), ary.length);
+        } else if (value instanceof boolean[]) {
+            boolean[] ary = (boolean[]) value;
+            SizeTPointer dims = new SizeTPointer(1).put(ary.length);
+            BooleanPointer data = new BooleanPointer(ary);
+            return PyArray_New(arrayType, 1, dims, NPY_BOOL, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof char[]) {
             char[] ary = (char[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
@@ -327,6 +338,12 @@ public class Python {
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             BytePointer data = new BytePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_BYTE, strides, data, 0, NPY_ARRAY_CARRAY, null);
+        } else if (value instanceof NpNdarrayBoolean) {
+            NpNdarrayBoolean ndary = (NpNdarrayBoolean) value;
+            SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
+            BooleanPointer data = new BooleanPointer(ndary.data);
+            return PyArray_New(arrayType, ndary.ndim(), dims, NPY_BOOL, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayChar) {
             NpNdarrayChar ndary = (NpNdarrayChar) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));

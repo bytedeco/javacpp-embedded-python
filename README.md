@@ -69,6 +69,7 @@ Pip.install("pandas");
 | Tuple<br>List | Object[] |
 | Dict | Map |
 | np.int8 ndarray | NpNdarrayByte |
+| np.bool8 ndarray | NpNdarrayBoolean |
 | np.int16 ndarray | NpNdarrayShort |
 | np.uint16 ndarray | NpNdarrayChar |
 | np.int32 ndarray | NpNdarrayInt |
@@ -88,6 +89,7 @@ Pip.install("pandas");
 | Iterable | List |
 | Map | Dict |
 | byte[] | bytes |
+| boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |
 | short[]<br>NpNdarrayShort | np.ndarray, dtype=np.int16 |
 | char[]<br>NpNdarrayChar | np.ndarray, dtype=np.uint16 |
 | int[]<br>NpNdarrayInt | np.ndarray, dtype=np.int32 |

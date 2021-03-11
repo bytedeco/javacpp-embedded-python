@@ -5,8 +5,7 @@ import scala.Function2;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PythonTest {
     @Test
@@ -71,6 +70,13 @@ public class PythonTest {
         assertEquals(3, ary3[0].length);
         assertEquals(4, ary3[0][0].length);
         assertEquals(17, ary3[1][1][1]);
+    }
+
+    @Test
+    public void testBooleanNdarray() {
+        Python.exec("import numpy as np");
+        NpNdarrayBoolean npary = Python.eval("np.array([True, False])");
+        assertArrayEquals(new boolean[]{true, false}, npary.toArray());
     }
 
     @Test(expected = PythonException.class)
