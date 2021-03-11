@@ -41,13 +41,13 @@ public class NpNdarrayChar extends NpNdarray {
     public char[] toArray() {
         if (ndim() != 1) throw new RuntimeException("ndim != 1");
 
-        if (strides[0] == itemsize() && data.length == dimensions[0]) {
+        if (strides[0] == 1 && data.length == dimensions[0]) {
             return data;
         } else {
-            int[] indexStrides = indexStrides();
+            int[] strides = this.strides;
             char[] ary = new char[dimensions[0]];
             for (int i = 0; i < ary.length; i++) {
-                ary[i] = data[i * indexStrides[0]];
+                ary[i] = data[i * strides[0]];
             }
             return ary;
         }
@@ -56,11 +56,11 @@ public class NpNdarrayChar extends NpNdarray {
     public char[][] toArray2d() {
         if (ndim() != 2) throw new RuntimeException("ndim != 2");
 
-        int[] indexStrides = indexStrides();
+        int[] strides = this.strides;
         char[][] ary = new char[dimensions[0]][dimensions[1]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
-                ary[i][j] = data[i * indexStrides[0] + j * indexStrides[1]];
+                ary[i][j] = data[i * strides[0] + j * strides[1]];
             }
         }
         return ary;
@@ -69,12 +69,12 @@ public class NpNdarrayChar extends NpNdarray {
     public char[][][] toArray3d() {
         if (ndim() != 3) throw new RuntimeException("ndim != 3");
 
-        int[] indexStrides = indexStrides();
+        int[] strides = this.strides;
         char[][][] ary = new char[dimensions[0]][dimensions[1]][dimensions[2]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
-                    ary[i][j][k] = data[i * indexStrides[0] + j * indexStrides[1] + k * indexStrides[2]];
+                    ary[i][j][k] = data[i * strides[0] + j * strides[1] + k * strides[2]];
                 }
             }
         }

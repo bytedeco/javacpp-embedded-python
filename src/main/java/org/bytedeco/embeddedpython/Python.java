@@ -219,37 +219,37 @@ public class Python {
                     CharPointer dataPtr = new CharPointer(PyArray_BYTES(aryObj));
                     char[] data = new char[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayChar(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayChar(data, toIntArray(dimensions), toIntArrayDiv(strides, 2));
                 }
                 case NPY_SHORTLTR: {
                     ShortPointer dataPtr = new ShortPointer(PyArray_BYTES(aryObj));
                     short[] data = new short[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayShort(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayShort(data, toIntArray(dimensions), toIntArrayDiv(strides, 2));
                 }
                 case NPY_INTLTR: {
                     IntPointer dataPtr = new IntPointer(PyArray_BYTES(aryObj));
                     int[] data = new int[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayInt(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayInt(data, toIntArray(dimensions), toIntArrayDiv(strides, 4));
                 }
                 case NPY_LONGLTR: {
                     CLongPointer dataPtr = new CLongPointer(PyArray_BYTES(aryObj));
                     long[] data = new long[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayLong(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayLong(data, toIntArray(dimensions), toIntArrayDiv(strides, 8));
                 }
                 case NPY_FLOATLTR: {
                     FloatPointer dataPtr = new FloatPointer(PyArray_BYTES(aryObj));
                     float[] data = new float[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayFloat(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayFloat(data, toIntArray(dimensions), toIntArrayDiv(strides, 4));
                 }
                 case NPY_DOUBLELTR: {
                     DoublePointer dataPtr = new DoublePointer(PyArray_BYTES(aryObj));
                     double[] data = new double[(int) PyArray_Size(aryObj)];
                     dataPtr.get(data);
-                    return new NpNdarrayDouble(data, toIntArray(dimensions), toIntArray(strides));
+                    return new NpNdarrayDouble(data, toIntArray(dimensions), toIntArrayDiv(strides, 8));
                 }
             }
         }
@@ -316,43 +316,43 @@ public class Python {
         } else if (value instanceof NpNdarrayByte) {
             NpNdarrayByte ndary = (NpNdarrayByte) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             BytePointer data = new BytePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_BYTE, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayChar) {
             NpNdarrayChar ndary = (NpNdarrayChar) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             CharPointer data = new CharPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_USHORT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayShort) {
             NpNdarrayShort ndary = (NpNdarrayShort) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             ShortPointer data = new ShortPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_SHORT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayInt) {
             NpNdarrayInt ndary = (NpNdarrayInt) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             IntPointer data = new IntPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_INT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayLong) {
             NpNdarrayLong ndary = (NpNdarrayLong) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             CLongPointer data = new CLongPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_LONG, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayFloat) {
             NpNdarrayFloat ndary = (NpNdarrayFloat) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             FloatPointer data = new FloatPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_FLOAT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayDouble) {
             NpNdarrayDouble ndary = (NpNdarrayDouble) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.dimensions));
-            SizeTPointer strides = new SizeTPointer(toLongArray(ndary.strides));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             DoublePointer data = new DoublePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_DOUBLE, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof Map) {
@@ -449,6 +449,14 @@ public class Python {
         int[] intAry = new int[longAry.length];
         for (int i = 0; i < longAry.length; i++) {
             intAry[i] = (int) longAry[i];
+        }
+        return intAry;
+    }
+
+    private static int[] toIntArrayDiv(long[] longAry, int v) {
+        int[] intAry = new int[longAry.length];
+        for (int i = 0; i < longAry.length; i++) {
+            intAry[i] = (int) (longAry[i] / v);
         }
         return intAry;
     }

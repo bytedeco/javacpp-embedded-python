@@ -3,10 +3,19 @@ package org.bytedeco.embeddedpython;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * Numpy np.ndarray.
+ */
 public abstract class NpNdarray implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * ndarray.shape
+     */
     public final int[] dimensions;
+    /**
+     * The unit of Numpy ndarray.strides is bytes, but the unit of this field is element.
+     */
     public final int[] strides;
 
     public NpNdarray(int[] dimensions, int[] strides) {
@@ -30,6 +39,10 @@ public abstract class NpNdarray implements Serializable {
      * The bytes of element.
      */
     public abstract int itemsize();
+
+    long[] stridesInBytes() {
+        return Arrays.stream(strides).mapToLong(s -> ((long) s) * ((long) itemsize())).toArray();
+    }
 
     @Override
     public String toString() {
@@ -55,10 +68,6 @@ public abstract class NpNdarray implements Serializable {
         int result = Arrays.hashCode(dimensions);
         result = 31 * result + Arrays.hashCode(strides);
         return result;
-    }
-
-    int[] indexStrides() {
-        return Arrays.stream(strides).map(s -> s / itemsize()).toArray();
     }
 }
 
