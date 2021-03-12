@@ -69,7 +69,7 @@ public abstract class NpNdarray implements Serializable {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                ", shape=" + Arrays.toString(shape) +
+                "shape=" + Arrays.toString(shape) +
                 ", strides=" + Arrays.toString(strides) +
                 '}';
     }
