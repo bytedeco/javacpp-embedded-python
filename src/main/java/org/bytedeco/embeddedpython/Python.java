@@ -11,6 +11,7 @@ import org.bytedeco.numpy.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -139,6 +140,7 @@ public class Python {
      * <tr><td>scalar np.int64</td><td>long</td></tr>
      * <tr><td>scalar np.float32</td><td>float</td></tr>
      * <tr><td>scalar np.float64</td><td>double</td></tr>
+     * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instantr</td></tr>
      * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
      * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
      * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
@@ -147,6 +149,7 @@ public class Python {
      * <tr><td>ndarray np.int64</td><td>NpNdarrayLong</td></tr>
      * <tr><td>ndarray np.float32</td><td>NpNdarrayFloat</td></tr>
      * <tr><td>ndarray np.float64</td><td>NpNdarrayDouble</td></tr>
+     * <tr><td>ndarray np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>NpNdarrayInstant</td></tr>
      * </tbody>
      * </table>
      *
@@ -181,6 +184,7 @@ public class Python {
      * <tr><td>long</td><td>int</td></tr>
      * <tr><td>float</td><td>float</td></tr>
      * <tr><td>double</td><td>float</td></tr>
+     * <tr><td>Instant</td><td>np.datetime64[ms]</td></tr>
      * <tr><td>String</td><td>str</td></tr>
      * <tr><td>Iterable</td><td>List</td></tr>
      * <tr><td>Map</td><td>Dict</td></tr>
@@ -192,6 +196,7 @@ public class Python {
      * <tr><td>long[]</td><td>np.ndarray, dtype=np.int64</td></tr>
      * <tr><td>float[]</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>double[]</td><td>np.ndarray, dtype=np.float64</td></tr>
+     * <tr><td>Instant[]</td><td>np.ndarray, dtype=np.datetime64[ms]</td></tr>
      * <tr><td>NpNdarrayBoolean</td><td>np.ndarray, dtype=np.bool8</td></tr>
      * <tr><td>NpNdarrayByte</td><td>np.ndarray, dtype=np.int8</td></tr>
      * <tr><td>NpNdarrayShort</td><td>np.ndarray, dtype=np.int16</td></tr>
@@ -200,6 +205,7 @@ public class Python {
      * <tr><td>NpNdarrayLong</td><td>np.ndarray, dtype=np.int64</td></tr>
      * <tr><td>NpNdarrayFloat</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>NpNdarrayDouble</td><td>np.ndarray, dtype=np.float64</td></tr>
+     * <tr><td>NpNdarrayInstant</td><td>np.ndarray, dtype=np.datetime64[ms]</td></tr>
      * <tr><td>scala.Function0 - Function22</td><td>global Python function</td></tr>
      * </tbody>
      * </table>
@@ -240,6 +246,7 @@ public class Python {
     private static final PyTypeObject longArrType = PyLongArrType_Type();
     private static final PyTypeObject floatArrType = PyFloatArrType_Type();
     private static final PyTypeObject doubleArrType = PyDoubleArrType_Type();
+    private static final PyTypeObject datetimeArrType = PyDatetimeArrType_Type();
     private static final PyTypeObject arrayType = PyArray_Type();
 
     private static Object toJava(PyObject obj) {
@@ -301,6 +308,33 @@ public class Python {
             return new PyFloatScalarObject(obj).obval();
         } else if (t.equals(doubleArrType)) {
             return new PyDoubleScalarObject(obj).obval();
+        } else if (t.equals(datetimeArrType)) {
+            PyDatetimeScalarObject datetimeScalarObj = new PyDatetimeScalarObject(obj);
+            int datetimteUnit = datetimeScalarObj.obmeta().base();
+            switch (datetimteUnit) {
+                case NPY_FR_W:
+                    return Instant.ofEpochSecond(datetimeScalarObj.obval() * (7L * 24L * 60L * 60L));
+                case NPY_FR_D:
+                    return Instant.ofEpochSecond(datetimeScalarObj.obval() * (24L * 60L * 60L));
+                case NPY_FR_h:
+                    return Instant.ofEpochSecond(datetimeScalarObj.obval() * (60L * 60L));
+                case NPY_FR_m:
+                    return Instant.ofEpochSecond(datetimeScalarObj.obval() * 60L);
+                case NPY_FR_s:
+                    return Instant.ofEpochSecond(datetimeScalarObj.obval());
+                case NPY_FR_ms:
+                    return Instant.ofEpochMilli(datetimeScalarObj.obval());
+                case NPY_FR_us:
+                    return Instant.ofEpochSecond(
+                            datetimeScalarObj.obval() / (1000L * 1000L),
+                            datetimeScalarObj.obval() % (1000L * 1000L));
+                case NPY_FR_ns:
+                    return Instant.ofEpochSecond(
+                            datetimeScalarObj.obval() / (1000L * 1000L * 1000L),
+                            datetimeScalarObj.obval() % (1000L * 1000L * 1000L));
+                default:
+                    throw new RuntimeException("Unsupported datetime unit. datetimteUnit = " + datetimteUnit);
+            }
         } else if (t.equals(arrayType)) {
             PyArrayObject aryObj = new PyArrayObject(obj);
             int ndim = PyArray_NDIM(aryObj);
@@ -378,6 +412,63 @@ public class Python {
                     dataPtr.get(data);
                     return new NpNdarrayDouble(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                 }
+                case NPY_DATETIMELTR: {
+                    LongPointer dataPtr = new LongPointer(PyArray_BYTES(aryObj));
+                    long[] longAry = new long[lengthToInt(PyArray_Size(aryObj))];
+                    dataPtr.get(longAry);
+                    Instant[] data = new Instant[longAry.length];
+
+                    int datetimteUnit = new PyArray_DatetimeDTypeMetaData(aryObj.descr().c_metadata()).meta().base();
+                    switch (datetimteUnit) {
+                        case NPY_FR_W:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(longAry[i] * (7L * 24L * 60L * 60L));
+                            }
+                            break;
+                        case NPY_FR_D:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(longAry[i] * (24L * 60L * 60L));
+                            }
+                            break;
+                        case NPY_FR_h:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(longAry[i] * (60L * 60L));
+                            }
+                            break;
+                        case NPY_FR_m:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(longAry[i] * 60L);
+                            }
+                            break;
+                        case NPY_FR_s:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(longAry[i]);
+                            }
+                            break;
+                        case NPY_FR_ms:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochMilli(longAry[i]);
+                            }
+                            break;
+                        case NPY_FR_us:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(
+                                        longAry[i] / (1000L * 1000L),
+                                        longAry[i] % (1000L * 1000L));
+                            }
+                            break;
+                        case NPY_FR_ns:
+                            for (int i = 0; i < data.length; i++) {
+                                data[i] = Instant.ofEpochSecond(
+                                        longAry[i] / (1000L * 1000L * 1000L),
+                                        longAry[i] % (1000L * 1000L * 1000L));
+                            }
+                            break;
+                        default:
+                            throw new RuntimeException("Unsupported datetime unit. datetimteUnit = " + datetimteUnit);
+                    }
+                    return new NpNdarrayInstant(data, toIntArray(shape), toIntArrayDiv(strides, 8));
+                }
             }
         }
         throw new PythonException("Unsupported Python type");
@@ -414,6 +505,12 @@ public class Python {
             return PyFloat_FromDouble((Double) value);
         } else if (value instanceof String) {
             return PyUnicode_FromString((String) value);
+        } else if (value instanceof Instant) {
+            Instant instant = (Instant) value;
+            LongPointer ptr = new LongPointer(1).put(instant.toEpochMilli());
+            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
+            return PyArray_Scalar(ptr, descr, null);
         } else if (value instanceof byte[]) {
             byte[] ary = (byte[]) value;
             return PyBytes_FromStringAndSize(new BytePointer(ary), ary.length);
@@ -452,6 +549,13 @@ public class Python {
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             DoublePointer data = new DoublePointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_DOUBLE, null, data, 0, NPY_ARRAY_CARRAY, null);
+        } else if (value instanceof Instant[]) {
+            Instant[] ary = (Instant[]) value;
+            SizeTPointer dims = new SizeTPointer(1).put(ary.length);
+            LongPointer data = new LongPointer(Arrays.stream(ary).mapToLong(Instant::toEpochMilli).toArray());
+            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
+            return PyArray_NewFromDescr(arrayType, descr, 1, dims, null, data, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayByte) {
             NpNdarrayByte ndary = (NpNdarrayByte) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
@@ -500,6 +604,14 @@ public class Python {
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             DoublePointer data = new DoublePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_DOUBLE, strides, data, 0, NPY_ARRAY_CARRAY, null);
+        } else if (value instanceof NpNdarrayInstant) {
+            NpNdarrayInstant ndary = (NpNdarrayInstant) value;
+            SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
+            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
+            LongPointer data = new LongPointer(Arrays.stream(ndary.data).mapToLong(Instant::toEpochMilli).toArray());
+            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
+            return PyArray_NewFromDescr(arrayType, descr, ndary.ndim(), dims, strides, data, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<Object, Object> map = (Map<Object, Object>) value;

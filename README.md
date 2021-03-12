@@ -68,6 +68,7 @@ Pip.install("pandas");
 | int<br>scalar np.int64 | long |
 | scalar np.float32 | float |
 | float<br>scalar np.float64 | double |
+| scalar np.datetime64[W, D, h, m, s, ms, us, or ns] | Instant |
 | str | String |
 | bytes<br>bytearray | byte[] |
 | Tuple<br>List | Object[] |
@@ -80,6 +81,7 @@ Pip.install("pandas");
 | ndarray np.int64 | NpNdarrayLong |
 | ndarray np.float32 | NpNdarrayFloat |
 | ndarray np.float64 | NpNdarrayDouble |
+| ndarray np.datetime64[W, D, h, m, s, ms, us, or ns] | NpNdarrayInstant |
 
 If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')```.
 
@@ -91,6 +93,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | boolean | bool |
 | byte<br>short<br>char<br>int<br>long | int |
 | float<br>double | float |
+| Instant | np.datetime64[ms] |
 | String | str |
 | Iterable | List |
 | Map | Dict |
@@ -103,6 +106,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | long[]<br>NpNdarrayLong | np.ndarray, dtype=np.int64 |
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
+| Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ms] |
 | scala.Function0 - Function22 | global Python function |
 
 ## Exceptions

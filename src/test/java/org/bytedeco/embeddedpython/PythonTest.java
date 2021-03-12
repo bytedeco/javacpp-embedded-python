@@ -3,6 +3,7 @@ package org.bytedeco.embeddedpython;
 import org.junit.Test;
 import scala.Function2;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -144,5 +145,43 @@ public class PythonTest {
                 "   v = True\n");
         boolean v = Python.get("v");
         assertTrue(v);
+    }
+
+    @Test
+    public void testDatetime() {
+        Python.exec("import numpy as np");
+
+        NpNdarrayInstant ndary1 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[s]')");
+        assertEquals("2021-03-01T10:02:03Z", ndary1.toArray()[0].toString());
+        NpNdarrayInstant ndary2 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[ms]')");
+        assertEquals("2021-03-01T10:02:03Z", ndary2.toArray()[0].toString());
+        NpNdarrayInstant ndary3 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[us]')");
+        assertEquals("2021-03-01T10:02:03Z", ndary3.toArray()[0].toString());
+        NpNdarrayInstant ndary4 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[ns]')");
+        assertEquals("2021-03-01T10:02:03Z", ndary4.toArray()[0].toString());
+
+        NpNdarrayInstant ndary5 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[m]')");
+        assertEquals("2021-03-01T10:02:00Z", ndary5.toArray()[0].toString());
+        NpNdarrayInstant ndary6 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[h]')");
+        assertEquals("2021-03-01T10:00:00Z", ndary6.toArray()[0].toString());
+        NpNdarrayInstant ndary7 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[D]')");
+        assertEquals("2021-03-01T00:00:00Z", ndary7.toArray()[0].toString());
+        NpNdarrayInstant ndary8 = Python.eval("np.array(['2021-03-01T10:02:03'], dtype='datetime64[W]')");
+        assertEquals("2021-02-25T00:00:00Z", ndary8.toArray()[0].toString());
+
+        Python.put("v", ndary4);
+        Python.exec("print(v)");
+        NpNdarrayInstant ndary9 = Python.get("v");
+        assertEquals(ndary4, ndary9);
+
+        Python.put("v", ndary4.data);
+        Python.exec("print(v)");
+        NpNdarrayInstant ndary10 = Python.get("v");
+        assertEquals(ndary4, ndary10);
+
+        Python.put("v", ndary4.data[0]);
+        Python.exec("print(v)");
+        Instant instant11 = Python.get("v");
+        assertEquals(ndary4.data[0], instant11);
     }
 }
