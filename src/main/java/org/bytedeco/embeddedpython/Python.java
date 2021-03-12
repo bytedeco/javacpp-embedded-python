@@ -503,14 +503,14 @@ public class Python {
             return PyFloat_FromDouble((Float) value);
         } else if (value instanceof Double) {
             return PyFloat_FromDouble((Double) value);
-        } else if (value instanceof String) {
-            return PyUnicode_FromString((String) value);
         } else if (value instanceof Instant) {
             Instant instant = (Instant) value;
             LongPointer ptr = new LongPointer(1).put(instant.toEpochMilli());
             PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
             new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
             return PyArray_Scalar(ptr, descr, null);
+        } else if (value instanceof String) {
+            return PyUnicode_FromString((String) value);
         } else if (value instanceof byte[]) {
             byte[] ary = (byte[]) value;
             return PyBytes_FromStringAndSize(new BytePointer(ary), ary.length);
