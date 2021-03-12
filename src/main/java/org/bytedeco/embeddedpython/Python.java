@@ -209,8 +209,8 @@ public class Python {
                 PyObject key = new PyObject();
                 PyObject value = new PyObject();
                 int ok = PyDict_Next(obj, pos, key, value);
+                if (ok == 0) break;
                 map.put(toJava(key), toJava(value));
-                if (ok != 0) break;
             }
             return map;
         } else if (t.equals(boolArrType)) {

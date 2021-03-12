@@ -4,6 +4,8 @@ import org.junit.Test;
 import scala.Function2;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -41,6 +43,19 @@ public class PythonTest {
         Object[] v = Python.get("v");
         assertEquals("foo", v[0]);
         assertEquals(123L, v[1]);
+    }
+
+    @Test
+    public void testMap() {
+        HashMap<String, List<Object>> map1 = new HashMap<>();
+        map1.put("a", Arrays.asList(1, 2));
+        map1.put("b", Arrays.asList(3, 4));
+        Python.put("v", map1);
+
+        HashMap<String, Object[]> map2 = Python.get("v");
+        assertEquals(map1.keySet(), map2.keySet());
+        assertArrayEquals(new Object[]{1L, 2L}, map2.get("a"));
+        assertArrayEquals(new Object[]{3L, 4L}, map2.get("b"));
     }
 
     @Test
