@@ -6,8 +6,8 @@ public class NpNdarrayShort extends NpNdarray {
     private static final long serialVersionUID = 1L;
     public final short[] data;
 
-    public NpNdarrayShort(short[] data, int[] dimensions, int[] strides) {
-        super(dimensions, strides);
+    public NpNdarrayShort(short[] data, int[] shape, int[] strides) {
+        super(shape, strides);
         if (data == null) throw new NullPointerException("data = null");
         this.data = data;
     }
@@ -41,11 +41,11 @@ public class NpNdarrayShort extends NpNdarray {
     public short[] toArray() {
         if (ndim() != 1) throw new RuntimeException("ndim != 1");
 
-        if (strides[0] == 1 && data.length == dimensions[0]) {
+        if (strides[0] == 1 && data.length == shape[0]) {
             return data;
         } else {
             int[] strides = this.strides;
-            short[] ary = new short[dimensions[0]];
+            short[] ary = new short[shape[0]];
             for (int i = 0; i < ary.length; i++) {
                 ary[i] = data[i * strides[0]];
             }
@@ -57,7 +57,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 2) throw new RuntimeException("ndim != 2");
 
         int[] strides = this.strides;
-        short[][] ary = new short[dimensions[0]][dimensions[1]];
+        short[][] ary = new short[shape[0]][shape[1]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 ary[i][j] = data[i * strides[0] + j * strides[1]];
@@ -70,7 +70,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 3) throw new RuntimeException("ndim != 3");
 
         int[] strides = this.strides;
-        short[][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]];
+        short[][][] ary = new short[shape[0]][shape[1]][shape[2]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
@@ -85,7 +85,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 4) throw new RuntimeException("ndim != 4");
 
         int[] strides = this.strides;
-        short[][][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]][dimensions[3]];
+        short[][][][] ary = new short[shape[0]][shape[1]][shape[2]][shape[3]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
@@ -102,7 +102,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 5) throw new RuntimeException("ndim != 5");
 
         int[] strides = this.strides;
-        short[][][][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]][dimensions[3]][dimensions[4]];
+        short[][][][][] ary = new short[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
@@ -121,7 +121,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 6) throw new RuntimeException("ndim != 6");
 
         int[] strides = this.strides;
-        short[][][][][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]][dimensions[3]][dimensions[4]][dimensions[5]];
+        short[][][][][][] ary = new short[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]][shape[5]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
@@ -142,7 +142,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 7) throw new RuntimeException("ndim != 7");
 
         int[] strides = this.strides;
-        short[][][][][][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]][dimensions[3]][dimensions[4]][dimensions[5]][dimensions[6]];
+        short[][][][][][][] ary = new short[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]][shape[5]][shape[6]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {
@@ -165,7 +165,7 @@ public class NpNdarrayShort extends NpNdarray {
         if (ndim() != 8) throw new RuntimeException("ndim != 8");
 
         int[] strides = this.strides;
-        short[][][][][][][][] ary = new short[dimensions[0]][dimensions[1]][dimensions[2]][dimensions[3]][dimensions[4]][dimensions[5]][dimensions[6]][dimensions[7]];
+        short[][][][][][][][] ary = new short[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]][shape[5]][shape[6]][shape[7]];
         for (int i = 0; i < ary.length; i++) {
             for (int j = 0; j < ary[i].length; j++) {
                 for (int k = 0; k < ary[i][j].length; k++) {

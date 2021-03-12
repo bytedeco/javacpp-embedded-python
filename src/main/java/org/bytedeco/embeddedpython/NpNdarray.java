@@ -12,27 +12,26 @@ public abstract class NpNdarray implements Serializable {
     /**
      * ndarray.shape
      */
-    public final int[] dimensions;
+    public final int[] shape;
     /**
      * The unit of Numpy ndarray.strides is bytes, but the unit of this field is element.
      */
     public final int[] strides;
 
-    public NpNdarray(int[] dimensions, int[] strides) {
-        if (dimensions.length != strides.length)
+    public NpNdarray(int[] shape, int[] strides) {
+        if (shape.length != strides.length)
             throw new IllegalArgumentException(
-                    "dimensions.length = " + dimensions.length +
-                            ", strides.length = " + strides.length);
+                    "shape.length = " + shape.length + ", strides.length = " + strides.length);
 
-        this.dimensions = dimensions;
+        this.shape = shape;
         this.strides = strides;
     }
 
     /**
-     * The length of dimensions.
+     * The length of shape.
      */
     public int ndim() {
-        return dimensions.length;
+        return shape.length;
     }
 
     /**
@@ -47,7 +46,7 @@ public abstract class NpNdarray implements Serializable {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                ", dimensions=" + Arrays.toString(dimensions) +
+                ", shape=" + Arrays.toString(shape) +
                 ", strides=" + Arrays.toString(strides) +
                 '}';
     }
@@ -59,13 +58,13 @@ public abstract class NpNdarray implements Serializable {
 
         NpNdarray npNdarray = (NpNdarray) o;
 
-        if (!Arrays.equals(dimensions, npNdarray.dimensions)) return false;
+        if (!Arrays.equals(shape, npNdarray.shape)) return false;
         return Arrays.equals(strides, npNdarray.strides);
     }
 
     @Override
     public int hashCode() {
-        int result = Arrays.hashCode(dimensions);
+        int result = Arrays.hashCode(shape);
         result = 31 * result + Arrays.hashCode(strides);
         return result;
     }
