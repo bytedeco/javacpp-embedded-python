@@ -56,26 +56,26 @@ Pip.install("pandas");
 | Python | Java |
 |--------|------|
 | None | null |
-| bool<br>np.bool8 scalar | boolean |
-| np.int8 scalar | byte |
-| np.int16 scalar | short |
-| np.uint16 scalar | char |
-| np.int32 scalar | int |
-| int<br>np.int64 scalar | long |
-| np.float32 scalar | float |
-| float<br>np.float64 scalar | double |
+| bool<br>scalar np.bool8 | boolean |
+| scalar np.int8 | byte |
+| scalar np.int16 | short |
+| scalar np.uint16 | char |
+| scalar np.int32 | int |
+| int<br>scalar np.int64 | long |
+| scalar np.float32 | float |
+| float<br>scalar np.float64 | double |
 | str | String |
 | bytes<br>bytearray | byte[] |
 | Tuple<br>List | Object[] |
 | Dict | Map |
-| np.int8 ndarray | NpNdarrayByte |
-| np.bool8 ndarray | NpNdarrayBoolean |
-| np.int16 ndarray | NpNdarrayShort |
-| np.uint16 ndarray | NpNdarrayChar |
-| np.int32 ndarray | NpNdarrayInt |
-| np.int64 ndarray | NpNdarrayLong |
-| np.float32 ndarray | NpNdarrayFloat |
-| np.float64 ndarray | NpNdarrayDouble |
+| ndarray np.int8 | NpNdarrayByte |
+| ndarray np.bool8 | NpNdarrayBoolean |
+| ndarray np.int16 | NpNdarrayShort |
+| ndarray np.uint16 | NpNdarrayChar |
+| ndarray np.int32 | NpNdarrayInt |
+| ndarray np.int64 | NpNdarrayLong |
+| ndarray np.float32 | NpNdarrayFloat |
+| ndarray np.float64 | NpNdarrayDouble |
 
 If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')```.
 
@@ -92,6 +92,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | Map | Dict |
 | byte[] | bytes |
 | boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |
+| NpNdarrayByte | np.ndarray, dtype=np.int8 |
 | short[]<br>NpNdarrayShort | np.ndarray, dtype=np.int16 |
 | char[]<br>NpNdarrayChar | np.ndarray, dtype=np.uint16 |
 | int[]<br>NpNdarrayInt | np.ndarray, dtype=np.int32 |

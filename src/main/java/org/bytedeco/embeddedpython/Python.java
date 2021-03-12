@@ -113,6 +113,39 @@ public class Python {
 
     /**
      * Get the global Python variable and convert it to a Java object.
+     * <p>
+     * <table border="1">
+     * <caption>Type mappings. Python to Java.</caption>
+     * <thead><tr><th>Python</th><th>Java</th></tr></thead>
+     * <tbody>
+     * <tr><td>None</td><td>null</td></tr>
+     * <tr><td>bool</td><td>boolean</td></tr>
+     * <tr><td>int</td><td>long</td></tr>
+     * <tr><td>float</td><td>double</td></tr>
+     * <tr><td>str</td><td>String</td></tr>
+     * <tr><td>bytes</td><td>byte[]</td></tr>
+     * <tr><td>bytearray</td><td>byte[]</td></tr>
+     * <tr><td>Tuple</td><td>Object[]</td></tr>
+     * <tr><td>List</td><td>Object[]</td></tr>
+     * <tr><td>Dict</td><td>Map</td></tr>
+     * <tr><td>scalar np.bool8</td><td>boolean</td></tr>
+     * <tr><td>scalar np.int8</td><td>byte</td></tr>
+     * <tr><td>scalar np.int16</td><td>short</td></tr>
+     * <tr><td>scalar np.uint16</td><td>char</td></tr>
+     * <tr><td>scalar np.int32</td><td>int</td></tr>
+     * <tr><td>scalar np.int64</td><td>long</td></tr>
+     * <tr><td>scalar np.float32</td><td>float</td></tr>
+     * <tr><td>scalar np.float64</td><td>double</td></tr>
+     * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
+     * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
+     * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
+     * <tr><td>ndarray np.uint16</td><td>NpNdarrayChar</td></tr>
+     * <tr><td>ndarray np.int32</td><td>NpNdarrayInt</td></tr>
+     * <tr><td>ndarray np.int64</td><td>NpNdarrayLong</td></tr>
+     * <tr><td>ndarray np.float32</td><td>NpNdarrayFloat</td></tr>
+     * <tr><td>ndarray np.float64</td><td>NpNdarrayDouble</td></tr>
+     * </tbody>
+     * </table>
      *
      * @param name The variable name
      * @throws PythonException        If the value cannot convert to a Java object.
@@ -131,6 +164,42 @@ public class Python {
 
     /**
      * Convert the Java object and set it to the global Python variable.
+     * <p>
+     * <table border="1">
+     * <caption>Type mappings. Java to Python.</caption>
+     * <thead><tr><th>Java</th><th>Python</th></tr></thead>
+     * <tbody>
+     * <tr><td>null</td><td>None</td></tr>
+     * <tr><td>boolean</td><td>bool</td></tr>
+     * <tr><td>byte</td><td>int</td></tr>
+     * <tr><td>short</td><td>int</td></tr>
+     * <tr><td>char</td><td>int</td></tr>
+     * <tr><td>int</td><td>int</td></tr>
+     * <tr><td>long</td><td>int</td></tr>
+     * <tr><td>float</td><td>float</td></tr>
+     * <tr><td>double</td><td>float</td></tr>
+     * <tr><td>String</td><td>str</td></tr>
+     * <tr><td>Iterable</td><td>List</td></tr>
+     * <tr><td>Map</td><td>Dict</td></tr>
+     * <tr><td>byte[]</td><td>bytes</td></tr>
+     * <tr><td>boolean[]</td><td>np.ndarray, dtype=np.bool8</td></tr>
+     * <tr><td>short[]</td><td>np.ndarray, dtype=np.int16</td></tr>
+     * <tr><td>char[]</td><td>np.ndarray, dtype=np.uint16</td></tr>
+     * <tr><td>int[]</td><td>np.ndarray, dtype=np.int32</td></tr>
+     * <tr><td>long[]</td><td>np.ndarray, dtype=np.int64</td></tr>
+     * <tr><td>float[]</td><td>np.ndarray, dtype=np.float32</td></tr>
+     * <tr><td>double[]</td><td>np.ndarray, dtype=np.float64</td></tr>
+     * <tr><td>NpNdarrayBoolean</td><td>np.ndarray, dtype=np.bool8</td></tr>
+     * <tr><td>NpNdarrayByte</td><td>np.ndarray, dtype=np.int8</td></tr>
+     * <tr><td>NpNdarrayShort</td><td>np.ndarray, dtype=np.int16</td></tr>
+     * <tr><td>NpNdarrayChar</td><td>np.ndarray, dtype=np.uint16</td></tr>
+     * <tr><td>NpNdarrayInt</td><td>np.ndarray, dtype=np.int32</td></tr>
+     * <tr><td>NpNdarrayLong</td><td>np.ndarray, dtype=np.int64</td></tr>
+     * <tr><td>NpNdarrayFloat</td><td>np.ndarray, dtype=np.float32</td></tr>
+     * <tr><td>NpNdarrayDouble</td><td>np.ndarray, dtype=np.float64</td></tr>
+     * <tr><td>scala.Function0 - Function22</td><td>global Python function</td></tr>
+     * </tbody>
+     * </table>
      *
      * @param name  The variable name
      * @param value The value to put.
