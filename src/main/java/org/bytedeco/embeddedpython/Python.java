@@ -11,11 +11,9 @@ import org.bytedeco.numpy.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.bytedeco.cpython.global.python.*;
@@ -114,7 +112,7 @@ public class Python {
     }
 
     /**
-     * Get the global Python variable and convert it to Java object.
+     * Get the global Python variable and convert it to a Java object.
      *
      * @param name The variable name
      * @throws PythonException        If the value cannot convert to a Java object.
@@ -498,34 +496,18 @@ public class Python {
     }
 
     private static long[] toLongArray(int[] intAry) {
-        long[] longAry = new long[intAry.length];
-        for (int i = 0; i < intAry.length; i++) {
-            longAry[i] = intAry[i];
-        }
-        return longAry;
+        return Arrays.stream(intAry).mapToLong(x -> x).toArray();
     }
 
     private static int[] toIntArray(long[] longAry) {
-        int[] intAry = new int[longAry.length];
-        for (int i = 0; i < longAry.length; i++) {
-            intAry[i] = (int) longAry[i];
-        }
-        return intAry;
+        return Arrays.stream(longAry).mapToInt(x -> (int) x).toArray();
     }
 
     private static int[] toIntArrayDiv(long[] longAry, int v) {
-        int[] intAry = new int[longAry.length];
-        for (int i = 0; i < longAry.length; i++) {
-            intAry[i] = (int) (longAry[i] / v);
-        }
-        return intAry;
+        return Arrays.stream(longAry).mapToInt(x -> (int) (x / v)).toArray();
     }
 
     private static Object[] toObjectArray(Iterable<Object> iterable) {
-        ArrayList<Object> result = new ArrayList<>();
-        for (Object obj : iterable) {
-            result.add(obj);
-        }
-        return result.toArray();
+        return StreamSupport.stream(iterable.spliterator(), false).toArray();
     }
 }
