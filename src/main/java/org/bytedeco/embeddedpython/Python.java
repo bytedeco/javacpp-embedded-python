@@ -79,6 +79,7 @@ public class Python {
      *
      * @param src Python code. This must be a single line code.
      */
+    @SuppressWarnings("unchecked")
     public synchronized static <T> T eval(String src) {
         PyObject co = compile(src);
         try {
@@ -90,7 +91,6 @@ public class Python {
                     }
                     throw new PythonException("PyEval_EvalCode() failed. An Error is thrown inside Python. src = " + src);
                 }
-                //noinspection unchecked
                 return (T) toJava(obj);
             } finally {
                 Py_DecRef(obj);
@@ -151,8 +151,8 @@ public class Python {
      * @throws PythonException        If the value cannot convert to a Java object.
      * @throws NoSuchElementException If the variable does not exists.
      */
+    @SuppressWarnings("unchecked")
     public synchronized static <T> T get(String name) {
-        //noinspection unchecked
         return (T) toJava(getPyObject(name));
     }
 
