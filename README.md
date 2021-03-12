@@ -4,6 +4,10 @@ With this library, you can embed Python to your Java or Scala project.
 This library is a wrapper of javacpp-presets/cpython.
 The main purpose of this library is to use Python libraries from Java or Scala.
 
+## Javadoc
+
+http://bytedeco.org/javacpp-embedded-python/apidocs/
+
 ## Usage
 
 You can put the global variable ```a```.
