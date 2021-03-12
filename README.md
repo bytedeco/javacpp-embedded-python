@@ -95,7 +95,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | float<br>double | float |
 | Instant | np.datetime64[ms] |
 | String | str |
-| Iterable | List |
+| Object[]<br>Iterable | List |
 | Map | Dict |
 | byte[] | bytes |
 | boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |

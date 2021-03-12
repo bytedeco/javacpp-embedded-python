@@ -187,6 +187,7 @@ public class Python {
      * <tr><td>Instant</td><td>np.datetime64[ms]</td></tr>
      * <tr><td>String</td><td>str</td></tr>
      * <tr><td>Iterable</td><td>List</td></tr>
+     * <tr><td>Object[]</td><td>List</td></tr>
      * <tr><td>Map</td><td>Dict</td></tr>
      * <tr><td>byte[]</td><td>bytes</td></tr>
      * <tr><td>boolean[]</td><td>np.ndarray, dtype=np.bool8</td></tr>
