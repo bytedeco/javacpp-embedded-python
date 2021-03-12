@@ -140,7 +140,7 @@ public class Python {
      * <tr><td>scalar np.int64</td><td>long</td></tr>
      * <tr><td>scalar np.float32</td><td>float</td></tr>
      * <tr><td>scalar np.float64</td><td>double</td></tr>
-     * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instantr</td></tr>
+     * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instant</td></tr>
      * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
      * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
      * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
