@@ -463,6 +463,70 @@ public class Python {
             @SuppressWarnings("unchecked")
             scala.Function6<Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function6<Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5]));
+        } else if (value instanceof scala.Function7) {
+            @SuppressWarnings("unchecked")
+            scala.Function7<Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function7<Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6]));
+        } else if (value instanceof scala.Function8) {
+            @SuppressWarnings("unchecked")
+            scala.Function8<Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function8<Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]));
+        } else if (value instanceof scala.Function9) {
+            @SuppressWarnings("unchecked")
+            scala.Function9<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function9<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]));
+        } else if (value instanceof scala.Function10) {
+            @SuppressWarnings("unchecked")
+            scala.Function10<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function10<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]));
+        } else if (value instanceof scala.Function11) {
+            @SuppressWarnings("unchecked")
+            scala.Function11<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function11<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]));
+        } else if (value instanceof scala.Function12) {
+            @SuppressWarnings("unchecked")
+            scala.Function12<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function12<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]));
+        } else if (value instanceof scala.Function13) {
+            @SuppressWarnings("unchecked")
+            scala.Function13<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function13<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12]));
+        } else if (value instanceof scala.Function14) {
+            @SuppressWarnings("unchecked")
+            scala.Function14<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function14<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13]));
+        } else if (value instanceof scala.Function15) {
+            @SuppressWarnings("unchecked")
+            scala.Function15<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function15<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]));
+        } else if (value instanceof scala.Function16) {
+            @SuppressWarnings("unchecked")
+            scala.Function16<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function16<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]));
+        } else if (value instanceof scala.Function17) {
+            @SuppressWarnings("unchecked")
+            scala.Function17<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function17<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16]));
+        } else if (value instanceof scala.Function18) {
+            @SuppressWarnings("unchecked")
+            scala.Function18<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function18<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17]));
+        } else if (value instanceof scala.Function19) {
+            @SuppressWarnings("unchecked")
+            scala.Function19<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function19<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]));
+        } else if (value instanceof scala.Function20) {
+            @SuppressWarnings("unchecked")
+            scala.Function20<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function20<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19]));
+        } else if (value instanceof scala.Function21) {
+            @SuppressWarnings("unchecked")
+            scala.Function21<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function21<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19], args[20]));
+        } else if (value instanceof scala.Function22) {
+            @SuppressWarnings("unchecked")
+            scala.Function22<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function22<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
+            return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19], args[20], args[21]));
         }
         throw new PythonException("Unsupported Java type. value = " + value);
     }

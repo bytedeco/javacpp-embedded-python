@@ -98,4 +98,4 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | long[]<br>NpNdarrayLong | np.ndarray, dtype=np.int64 |
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
-| scala.Function0 - Function6 | global Python function |
+| scala.Function0 - Function22 | global Python function |
