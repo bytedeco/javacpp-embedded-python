@@ -11,7 +11,10 @@ import org.bytedeco.numpy.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
@@ -342,7 +345,23 @@ public class Python {
                     return new NpNdarrayInt(data, toIntArray(shape), toIntArrayDiv(strides, 4));
                 }
                 case NPY_LONGLTR: {
-                    CLongPointer dataPtr = new CLongPointer(PyArray_BYTES(aryObj));
+                    int itemsize = (int) PyArray_ITEMSIZE(aryObj);
+                    if (itemsize == 4) {
+                        IntPointer dataPtr = new IntPointer(PyArray_BYTES(aryObj));
+                        int[] data = new int[lengthToInt(PyArray_Size(aryObj))];
+                        dataPtr.get(data);
+                        return new NpNdarrayInt(data, toIntArray(shape), toIntArrayDiv(strides, 4));
+                    } else if (itemsize == 8) {
+                        LongPointer dataPtr = new LongPointer(PyArray_BYTES(aryObj));
+                        long[] data = new long[lengthToInt(PyArray_Size(aryObj))];
+                        dataPtr.get(data);
+                        return new NpNdarrayLong(data, toIntArray(shape), toIntArrayDiv(strides, 8));
+                    } else {
+                        throw new RuntimeException("Unsupported itemsize for long. itemsize = " + itemsize);
+                    }
+                }
+                case NPY_LONGLONGLTR: {
+                    LongPointer dataPtr = new LongPointer(PyArray_BYTES(aryObj));
                     long[] data = new long[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayLong(data, toIntArray(shape), toIntArrayDiv(strides, 8));
@@ -421,8 +440,8 @@ public class Python {
         } else if (value instanceof long[]) {
             long[] ary = (long[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
-            CLongPointer data = new CLongPointer(ary);
-            return PyArray_New(arrayType, 1, dims, NPY_LONG, null, data, 0, NPY_ARRAY_CARRAY, null);
+            LongPointer data = new LongPointer(ary);
+            return PyArray_New(arrayType, 1, dims, NPY_LONGLONG, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof float[]) {
             float[] ary = (float[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
@@ -467,8 +486,8 @@ public class Python {
             NpNdarrayLong ndary = (NpNdarrayLong) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
-            CLongPointer data = new CLongPointer(ndary.data);
-            return PyArray_New(arrayType, ndary.ndim(), dims, NPY_LONG, strides, data, 0, NPY_ARRAY_CARRAY, null);
+            LongPointer data = new LongPointer(ndary.data);
+            return PyArray_New(arrayType, ndary.ndim(), dims, NPY_LONGLONG, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayFloat) {
             NpNdarrayFloat ndary = (NpNdarrayFloat) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));

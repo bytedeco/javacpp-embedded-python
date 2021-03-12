@@ -75,6 +75,18 @@ public class PythonTest {
     }
 
     @Test
+    public void testLongArray() {
+        Python.exec("import numpy as np");
+
+        long[] ary1 = new long[]{Long.MAX_VALUE - 1, Long.MAX_VALUE - 2};
+        Python.put("v", ary1);
+        NpNdarrayLong ndary2 = Python.get("v");
+        NpNdarrayLong ndary3 = Python.eval("np.array(" + Arrays.toString(ary1) + ", dtype=np.int64)");
+        assertArrayEquals(ary1, ndary2.toArray());
+        assertArrayEquals(ary1, ndary3.toArray());
+    }
+
+    @Test
     public void testFloatArray2d() {
         Python.exec("import numpy as np");
 
