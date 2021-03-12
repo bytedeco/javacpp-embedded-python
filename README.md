@@ -77,6 +77,8 @@ Pip.install("pandas");
 | np.float32 ndarray | NpNdarrayFloat |
 | np.float64 ndarray | NpNdarrayDouble |
 
+If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')```.
+
 ### Java to Python
 
 | Java | Python |
