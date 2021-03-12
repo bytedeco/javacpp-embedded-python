@@ -12,6 +12,144 @@ public class NpNdarrayFloat extends NpNdarray {
         this.data = data;
     }
 
+    public NpNdarrayFloat(float[] ary) {
+        super(new int[]{ary.length});
+        this.data = ary.clone();
+    }
+
+    public NpNdarrayFloat(float[][] ary) {
+        super(new int[]{ary.length, ary[0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                data[i * strides[0] + j * strides[1]] = ary[i][j];
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    data[i * strides[0] + j * strides[1] + k * strides[2]] = ary[i][j][k];
+                }
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length, ary[0][0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    for (int l = 0; l < shape[3]; l++) {
+                        data[i * strides[0] + j * strides[1] + k * strides[2] + l * strides[3]] = ary[i][j][k][l];
+                    }
+                }
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length, ary[0][0][0].length, ary[0][0][0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    for (int l = 0; l < shape[3]; l++) {
+                        for (int m = 0; m < shape[4]; m++) {
+                            data[i * strides[0] + j * strides[1] + k * strides[2] + l * strides[3] + m * strides[4]] = ary[i][j][k][l][m];
+                        }
+                    }
+                }
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][][][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length, ary[0][0][0].length, ary[0][0][0][0].length, ary[0][0][0][0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    for (int l = 0; l < shape[3]; l++) {
+                        for (int m = 0; m < shape[4]; m++) {
+                            for (int n = 0; n < shape[5]; n++) {
+                                data[i * strides[0] + j * strides[1] + k * strides[2] + l * strides[3] + m * strides[4] + n * strides[5]] = ary[i][j][k][l][m][n];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][][][][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length, ary[0][0][0].length, ary[0][0][0][0].length, ary[0][0][0][0][0].length, ary[0][0][0][0][0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    for (int l = 0; l < shape[3]; l++) {
+                        for (int m = 0; m < shape[4]; m++) {
+                            for (int n = 0; n < shape[5]; n++) {
+                                for (int o = 0; o < shape[6]; o++) {
+                                    data[i * strides[0] + j * strides[1] + k * strides[2] + l * strides[3] + m * strides[4] + n * strides[5] + o * strides[6]] = ary[i][j][k][l][m][n][o];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.data = data;
+    }
+
+    public NpNdarrayFloat(float[][][][][][][][] ary) {
+        super(new int[]{ary.length, ary[0].length, ary[0][0].length, ary[0][0][0].length, ary[0][0][0][0].length, ary[0][0][0][0][0].length, ary[0][0][0][0][0][0].length, ary[0][0][0][0][0][0][0].length});
+        int[] shape = this.shape;
+        int[] strides = this.strides;
+        float[] data = new float[intAryProduct(shape)];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                for (int k = 0; k < shape[2]; k++) {
+                    for (int l = 0; l < shape[3]; l++) {
+                        for (int m = 0; m < shape[4]; m++) {
+                            for (int n = 0; n < shape[5]; n++) {
+                                for (int o = 0; o < shape[6]; o++) {
+                                    for (int p = 0; p < shape[7]; p++) {
+                                        data[i * strides[0] + j * strides[1] + k * strides[2] + l * strides[3] + m * strides[4] + n * strides[5] + o * strides[6] + p * strides[7]] = ary[i][j][k][l][m][n][o][p];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.data = data;
+    }
+
     /**
      * The bytes of element.
      */

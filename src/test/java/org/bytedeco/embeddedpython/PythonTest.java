@@ -88,12 +88,14 @@ public class PythonTest {
         float[] ary1 = ndary1.toArray();
         assertEquals(3, ary1.length);
         assertEquals(2f, ary1[2], 1e-10f);
+        assertEquals(ndary1, new NpNdarrayFloat(ary1));
 
         NpNdarrayFloat ndary2 = Python.eval("np.arange(6, dtype=np.float32).reshape([2, 3])");
         float[][] ary2 = ndary2.toArray2d();
         assertEquals(2, ary2.length);
         assertEquals(3, ary2[0].length);
         assertEquals(3f, ary2[1][0], 1e-10f);
+        assertEquals(ndary2, new NpNdarrayFloat(ary2));
 
         NpNdarrayChar ndary3 = Python.eval("np.arange(24, dtype=np.uint16).reshape([2, 3, 4])");
         char[][][] ary3 = ndary3.toArray3d();
@@ -101,6 +103,7 @@ public class PythonTest {
         assertEquals(3, ary3[0].length);
         assertEquals(4, ary3[0][0].length);
         assertEquals(17, ary3[1][1][1]);
+        assertEquals(ndary3, new NpNdarrayChar(ary3));
     }
 
     @Test

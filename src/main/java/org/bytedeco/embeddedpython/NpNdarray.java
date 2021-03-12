@@ -27,6 +27,29 @@ public abstract class NpNdarray implements Serializable {
         this.strides = strides;
     }
 
+    NpNdarray(int[] shape) {
+        this.shape = shape;
+        this.strides = toContiguousStrides(shape);
+    }
+
+    private static int[] toContiguousStrides(int[] shape) {
+        int[] strides = new int[shape.length];
+        int s = 1;
+        for (int i = shape.length - 1; i >= 0; i--) {
+            strides[i] = s;
+            s *= shape[i];
+        }
+        return strides;
+    }
+
+    static int intAryProduct(int[] ary) {
+        int s = 1;
+        for (int j : ary) {
+            s *= j;
+        }
+        return s;
+    }
+
     /**
      * The length of shape.
      */
