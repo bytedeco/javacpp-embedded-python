@@ -59,6 +59,22 @@ public class PythonTest {
     }
 
     @Test
+    public void testBytes() {
+        byte[] ary1 = new byte[]{1, 2, 3};
+        Python.put("v", ary1);
+        byte[] ary2 = Python.get("v");
+        assertArrayEquals(ary1, ary2);
+    }
+
+    @Test
+    public void testByteArray() {
+        byte[] ary1 = new byte[]{1, 2, 3};
+        Python.put("v", ary1);
+        byte[] ary2 = Python.eval("bytearray(v)");
+        assertArrayEquals(ary1, ary2);
+    }
+
+    @Test
     public void testFloatArray2d() {
         Python.exec("import numpy as np");
 
