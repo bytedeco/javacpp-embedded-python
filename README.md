@@ -99,3 +99,15 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
 | scala.Function0 - Function22 | global Python function |
+
+## Exceptions
+
+### Python to Java
+When Python code throws exceptions in ```Python.eval()``` or ```Python.exec()```,
+tracebacks are printed to stderr,
+and ```PythonException``` is thrown in Java.
+
+### Java to Python
+When Java code throws exceptions in the Java lambda,
+```Throwable.printStackTrace()``` is called,
+and ```RuntimeError``` is thrown in Python.

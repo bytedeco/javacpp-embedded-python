@@ -8,6 +8,9 @@ import java.util.stream.Stream;
 
 /**
  * Pip.
+ * <p>
+ * JavaCPP presets Python is installed to ~/.javacpp/cache folder.
+ * This Pip class will install Python libraries to this folder.
  */
 public class Pip {
     private static final String python = Loader.load(org.bytedeco.cpython.python.class);

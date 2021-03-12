@@ -24,7 +24,7 @@ import static org.bytedeco.numpy.global.numpy.*;
 /**
  * Python interpreter.
  * <p>
- * If you embed two Python, many Python libraries do not work correctly.
+ * If you embed two Python interpreters, many Python libraries do not work correctly.
  * Therefore this class is a singleton class. All the methods are static.
  * <p>
  * This class is thread-safe. All the methods are synchronized.
