@@ -83,6 +83,9 @@
                 <version>3.2.0</version>
                 <configuration>
                     <additionalJOption>-J-Duser.language=en_US</additionalJOption>
+                    <additionalOptions>
+                        <additionalOption>-notimestamp</additionalOption>
+                    </additionalOptions>
                     <locale>en_US</locale>
                     <show>protected</show>
                     <source>8</source>
