@@ -20,6 +20,11 @@ public class Pip {
 
     /**
      * Install pip packages.
+     *
+     * @param packages The package names to install.
+     * @return 0 on success.
+     * @throws IOException If an I/O error occurs.
+     * @throws InterruptedException If the current thread is interrupted by another thread.
      */
     public static synchronized int install(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "install"}, packages));
@@ -27,6 +32,11 @@ public class Pip {
 
     /**
      * Upgrade pip packages.
+     *
+     * @param packages The package names to upgrade.
+     * @return 0 on success.
+     * @throws IOException If an I/O error occurs.
+     * @throws InterruptedException If the current thread is interrupted by another thread.
      */
     public static synchronized int upgrade(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "install", "--upgrade"}, packages));
@@ -34,6 +44,11 @@ public class Pip {
 
     /**
      * Uninstall pip packages.
+     *
+     * @param packages The package names to uninstall.
+     * @return 0 on success.
+     * @throws IOException If an I/O error occurs.
+     * @throws InterruptedException If the current thread is interrupted by another thread.
      */
     public static synchronized int uninstall(String... packages) throws IOException, InterruptedException {
         return exec(concat(new String[]{python, "-m", "pip", "uninstall"}, packages));

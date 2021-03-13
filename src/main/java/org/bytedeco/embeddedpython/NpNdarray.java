@@ -51,14 +51,18 @@ public abstract class NpNdarray implements Serializable {
     }
 
     /**
-     * The length of shape.
+     * ndarray.ndim
+     *
+     * @return The length of shape.
      */
     public int ndim() {
         return shape.length;
     }
 
     /**
-     * The bytes of element.
+     * ndarray.itemsize
+     *
+     * @return The bytes of element.
      */
     public abstract int itemsize();
 

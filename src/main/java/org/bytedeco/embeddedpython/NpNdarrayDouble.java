@@ -150,9 +150,6 @@ public class NpNdarrayDouble extends NpNdarray {
         this.data = data;
     }
 
-    /**
-     * The bytes of element.
-     */
     @Override
     public int itemsize() {
         return 8;

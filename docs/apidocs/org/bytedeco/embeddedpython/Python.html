@@ -237,8 +237,12 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <pre class="methodSignature">public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;eval&#8203;(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;src)</pre>
 <div class="block">Python built-in eval().</div>
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The Java class after conversion from Python.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>src</code> - Python code. This must be a single line code.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Java object converted from the Python object.</dd>
 </dl>
 </li>
 </ul>
@@ -264,7 +268,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <h4>get</h4>
 <pre class="methodSignature">public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;get&#8203;(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name)</pre>
 <div class="block">Get the global Python variable and convert it to a Java object.
- <p>
+
  <table border="1">
  <caption>Type mappings. Python to Java.</caption>
  <thead><tr><th>Python</th><th>Java</th></tr></thead>
@@ -300,8 +304,12 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
  </tbody>
  </table></div>
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The Java class after conversion from Python.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - The variable name</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Java object converted from the Python object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="PythonException.html" title="class in org.bytedeco.embeddedpython">PythonException</a></code> - If the value cannot convert to a Java object.</dd>
 <dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/NoSuchElementException.html?is-external=true" title="class or interface in java.util" class="externalLink">NoSuchElementException</a></code> - If the variable does not exists.</dd>
@@ -317,7 +325,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <pre class="methodSignature">public static&nbsp;void&nbsp;put&#8203;(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;value)</pre>
 <div class="block">Convert the Java object and set it to the global Python variable.
- <p>
+
  <table border="1">
  <caption>Type mappings. Java to Python.</caption>
  <thead><tr><th>Java</th><th>Python</th></tr></thead>

@@ -86,6 +86,8 @@ public class Python {
      * Python built-in eval().
      *
      * @param src Python code. This must be a single line code.
+     * @param <T> The Java class after conversion from Python.
+     * @return The Java object converted from the Python object.
      */
     @SuppressWarnings("unchecked")
     public synchronized static <T> T eval(String src) {
@@ -123,7 +125,7 @@ public class Python {
 
     /**
      * Get the global Python variable and convert it to a Java object.
-     * <p>
+     *
      * <table border="1">
      * <caption>Type mappings. Python to Java.</caption>
      * <thead><tr><th>Python</th><th>Java</th></tr></thead>
@@ -160,6 +162,8 @@ public class Python {
      * </table>
      *
      * @param name The variable name
+     * @param <T> The Java class after conversion from Python.
+     * @return The Java object converted from the Python object.
      * @throws PythonException        If the value cannot convert to a Java object.
      * @throws NoSuchElementException If the variable does not exists.
      */
@@ -176,7 +180,7 @@ public class Python {
 
     /**
      * Convert the Java object and set it to the global Python variable.
-     * <p>
+     *
      * <table border="1">
      * <caption>Type mappings. Java to Python.</caption>
      * <thead><tr><th>Java</th><th>Python</th></tr></thead>
