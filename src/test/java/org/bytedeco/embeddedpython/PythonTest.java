@@ -4,9 +4,7 @@ import org.junit.Test;
 import scala.Function2;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -202,5 +200,28 @@ public class PythonTest {
         System.out.println("1");
         Python.exec("print(2)");
         System.out.println("3");
+    }
+
+    @Test(expected = PythonException.class)
+    public void testUnsupportedJavaType1() {
+        try {
+            Python.put("v", UUID.randomUUID());
+        } catch (PythonException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Test(expected = PythonException.class)
+    public void testUnsupportedJavaType2() {
+        try {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("a", Arrays.asList(1, 2));
+            map.put("b", UUID.randomUUID());
+            Python.put("v", map);
+        } catch (PythonException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

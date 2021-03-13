@@ -226,7 +226,8 @@ public class Python {
      * @throws PythonException If the value cannot convert to a Python object.
      */
     public synchronized static void put(String name, Object value) {
-        putPyObject(name, toPyObject(value));
+        TypeTreeBuilder builder = new TypeTreeBuilder(1);
+        putPyObject(name, toPyObject(value, builder));
     }
 
     private static void putPyObject(String name, PyObject obj) {
@@ -482,7 +483,7 @@ public class Python {
                 }
             }
         }
-        throw new PythonException("Unsupported Python type");
+        throw new PythonException("Cannot convert the Python object to a Java object.");
     }
 
     private static int lengthToInt(long length) {
@@ -495,26 +496,36 @@ public class Python {
     /**
      * Don't forget to call Py_DecRef().
      */
-    private static PyObject toPyObject(Object value) {
+    private static PyObject toPyObject(Object value, TypeTreeBuilder builder) {
         if (value == null) {
+            builder.addType("null");
             return _Py_NoneStruct();
         } else if (value instanceof Boolean) {
+            builder.addType("Boolean");
             return PyBool_FromLong((Boolean) value ? 1 : 0);
         } else if (value instanceof Byte) {
+            builder.addType("Byte");
             return PyLong_FromLong((Byte) value);
         } else if (value instanceof Character) {
+            builder.addType("Character");
             return PyLong_FromLong((Character) value);
         } else if (value instanceof Short) {
+            builder.addType("Short");
             return PyLong_FromLong((Short) value);
         } else if (value instanceof Integer) {
+            builder.addType("Integer");
             return PyLong_FromLong((Integer) value);
         } else if (value instanceof Long) {
+            builder.addType("Long");
             return PyLong_FromLong((Long) value);
         } else if (value instanceof Float) {
+            builder.addType("Float");
             return PyFloat_FromDouble((Float) value);
         } else if (value instanceof Double) {
+            builder.addType("Double");
             return PyFloat_FromDouble((Double) value);
         } else if (value instanceof Instant) {
+            builder.addType("Instant");
             try {
                 Instant instant = (Instant) value;
                 LongPointer ptr = new LongPointer(1).put(
@@ -526,46 +537,56 @@ public class Python {
                 throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
             }
         } else if (value instanceof String) {
+            builder.addType("String");
             return PyUnicode_FromString((String) value);
         } else if (value instanceof byte[]) {
+            builder.addType("byte[]");
             byte[] ary = (byte[]) value;
             return PyBytes_FromStringAndSize(new BytePointer(ary), ary.length);
         } else if (value instanceof boolean[]) {
+            builder.addType("boolean[]");
             boolean[] ary = (boolean[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             BooleanPointer data = new BooleanPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_BOOL, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof char[]) {
+            builder.addType("char[]");
             char[] ary = (char[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             CharPointer data = new CharPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_USHORT, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof short[]) {
+            builder.addType("short[]");
             short[] ary = (short[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             ShortPointer data = new ShortPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_SHORT, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof int[]) {
+            builder.addType("int[]");
             int[] ary = (int[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             IntPointer data = new IntPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_INT, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof long[]) {
+            builder.addType("long[]");
             long[] ary = (long[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             LongPointer data = new LongPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_LONGLONG, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof float[]) {
+            builder.addType("float[]");
             float[] ary = (float[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             FloatPointer data = new FloatPointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_FLOAT, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof double[]) {
+            builder.addType("double[]");
             double[] ary = (double[]) value;
             SizeTPointer dims = new SizeTPointer(1).put(ary.length);
             DoublePointer data = new DoublePointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_DOUBLE, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof Instant[]) {
+            builder.addType("Instant[]");
             try {
                 Instant[] ary = (Instant[]) value;
                 SizeTPointer dims = new SizeTPointer(1).put(ary.length);
@@ -579,54 +600,63 @@ public class Python {
                 throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
             }
         } else if (value instanceof NpNdarrayByte) {
+            builder.addType("NpNdarrayByte");
             NpNdarrayByte ndary = (NpNdarrayByte) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             BytePointer data = new BytePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_BYTE, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayBoolean) {
+            builder.addType("NpNdarrayBoolean");
             NpNdarrayBoolean ndary = (NpNdarrayBoolean) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             BooleanPointer data = new BooleanPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_BOOL, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayChar) {
+            builder.addType("NpNdarrayChar");
             NpNdarrayChar ndary = (NpNdarrayChar) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             CharPointer data = new CharPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_USHORT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayShort) {
+            builder.addType("NpNdarrayShort");
             NpNdarrayShort ndary = (NpNdarrayShort) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             ShortPointer data = new ShortPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_SHORT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayInt) {
+            builder.addType("NpNdarrayInt");
             NpNdarrayInt ndary = (NpNdarrayInt) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             IntPointer data = new IntPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_INT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayLong) {
+            builder.addType("NpNdarrayLong");
             NpNdarrayLong ndary = (NpNdarrayLong) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             LongPointer data = new LongPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_LONGLONG, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayFloat) {
+            builder.addType("NpNdarrayFloat");
             NpNdarrayFloat ndary = (NpNdarrayFloat) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             FloatPointer data = new FloatPointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_FLOAT, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayDouble) {
+            builder.addType("NpNdarrayDouble");
             NpNdarrayDouble ndary = (NpNdarrayDouble) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
             SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
             DoublePointer data = new DoublePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_DOUBLE, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayInstant) {
+            builder.addType("NpNdarrayInstant");
             try {
                 NpNdarrayInstant ndary = (NpNdarrayInstant) value;
                 SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
@@ -641,129 +671,181 @@ public class Python {
                 throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
             }
         } else if (value instanceof Map) {
+            builder.addType("Map");
+            builder.tab++;
+
             @SuppressWarnings("unchecked")
             Map<Object, Object> map = (Map<Object, Object>) value;
             PyObject obj = PyDict_New();
-            for (Object key : map.keySet()) {
-                PyDict_SetItem(obj, toPyObject(key), toPyObject(map.get(key)));
-            }
+            map.forEach((key, v) -> {
+                builder.addType("Map.Entry");
+                builder.tab++;
+                PyDict_SetItem(obj, toPyObject(key, builder), toPyObject(v, builder));
+                builder.tab--;
+            });
+
+            builder.tab--;
             return obj;
         } else if (value instanceof scala.collection.Map) {
+            builder.addType("scala.collection.Map");
+            builder.tab++;
+
             @SuppressWarnings("unchecked")
             scala.collection.Map<Object, Object> map = (scala.collection.Map<Object, Object>) value;
             PyObject obj = PyDict_New();
             map.foreachEntry((key, v) -> {
-                PyDict_SetItem(obj, toPyObject(key), toPyObject(v));
+                builder.addType("Map.Entry");
+                builder.tab++;
+                PyDict_SetItem(obj, toPyObject(key, builder), toPyObject(v, builder));
+                builder.tab--;
                 return null;
             });
+
+            builder.tab--;
             return obj;
         } else if (value instanceof Object[]) {
+            builder.addType("Object[]");
+            builder.tab++;
+
             Object[] ary = (Object[]) value;
             PyObject obj = PyList_New(ary.length);
             for (int i = 0; i < ary.length; i++) {
-                PyList_SetItem(obj, i, toPyObject(ary[i]));
+                PyList_SetItem(obj, i, toPyObject(ary[i], builder));
             }
+
+            builder.tab--;
             return obj;
         } else if (value instanceof Iterable) {
+            builder.addType("Iterable(" + value.getClass().getName() + ")");
+            builder.tab++;
+
             @SuppressWarnings("unchecked")
             Iterable<Object> iter = (Iterable<Object>) value;
             PyObject obj = PyList_New(0);
-            iter.forEach(v -> PyList_Append(obj, toPyObject(v)));
+            iter.forEach(v -> PyList_Append(obj, toPyObject(v, builder)));
+
+            builder.tab--;
             return obj;
         } else if (value instanceof scala.Function0) {
+            builder.addType("scala.Function0");
             @SuppressWarnings("unchecked")
             scala.Function0<Object> fn = (scala.Function0<Object>) value;
             return toPyCFunction(args -> fn.apply());
         } else if (value instanceof scala.Function1) {
+            builder.addType("scala.Function1");
             @SuppressWarnings("unchecked")
             scala.Function1<Object, Object> fn = (scala.Function1<Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0]));
         } else if (value instanceof scala.Function2) {
+            builder.addType("scala.Function2");
             @SuppressWarnings("unchecked")
             scala.Function2<Object, Object, Object> fn = (scala.Function2<Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1]));
         } else if (value instanceof scala.Function3) {
+            builder.addType("scala.Function3");
             @SuppressWarnings("unchecked")
             scala.Function3<Object, Object, Object, Object> fn = (scala.Function3<Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2]));
         } else if (value instanceof scala.Function4) {
+            builder.addType("scala.Function4");
             @SuppressWarnings("unchecked")
             scala.Function4<Object, Object, Object, Object, Object> fn = (scala.Function4<Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3]));
         } else if (value instanceof scala.Function5) {
+            builder.addType("scala.Function5");
             @SuppressWarnings("unchecked")
             scala.Function5<Object, Object, Object, Object, Object, Object> fn = (scala.Function5<Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4]));
         } else if (value instanceof scala.Function6) {
+            builder.addType("scala.Function6");
             @SuppressWarnings("unchecked")
             scala.Function6<Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function6<Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5]));
         } else if (value instanceof scala.Function7) {
+            builder.addType("scala.Function7");
             @SuppressWarnings("unchecked")
             scala.Function7<Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function7<Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6]));
         } else if (value instanceof scala.Function8) {
+            builder.addType("scala.Function8");
             @SuppressWarnings("unchecked")
             scala.Function8<Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function8<Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]));
         } else if (value instanceof scala.Function9) {
+            builder.addType("scala.Function9");
             @SuppressWarnings("unchecked")
             scala.Function9<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function9<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]));
         } else if (value instanceof scala.Function10) {
+            builder.addType("scala.Function10");
             @SuppressWarnings("unchecked")
             scala.Function10<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function10<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]));
         } else if (value instanceof scala.Function11) {
+            builder.addType("scala.Function11");
             @SuppressWarnings("unchecked")
             scala.Function11<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function11<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]));
         } else if (value instanceof scala.Function12) {
+            builder.addType("scala.Function12");
             @SuppressWarnings("unchecked")
             scala.Function12<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function12<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]));
         } else if (value instanceof scala.Function13) {
+            builder.addType("scala.Function13");
             @SuppressWarnings("unchecked")
             scala.Function13<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function13<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12]));
         } else if (value instanceof scala.Function14) {
+            builder.addType("scala.Function14");
             @SuppressWarnings("unchecked")
             scala.Function14<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function14<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13]));
         } else if (value instanceof scala.Function15) {
+            builder.addType("scala.Function15");
             @SuppressWarnings("unchecked")
             scala.Function15<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function15<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]));
         } else if (value instanceof scala.Function16) {
+            builder.addType("scala.Function16");
             @SuppressWarnings("unchecked")
             scala.Function16<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function16<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]));
         } else if (value instanceof scala.Function17) {
+            builder.addType("scala.Function17");
             @SuppressWarnings("unchecked")
             scala.Function17<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function17<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16]));
         } else if (value instanceof scala.Function18) {
+            builder.addType("scala.Function18");
             @SuppressWarnings("unchecked")
             scala.Function18<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function18<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17]));
         } else if (value instanceof scala.Function19) {
+            builder.addType("scala.Function19");
             @SuppressWarnings("unchecked")
             scala.Function19<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function19<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]));
         } else if (value instanceof scala.Function20) {
+            builder.addType("scala.Function20");
             @SuppressWarnings("unchecked")
             scala.Function20<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function20<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19]));
         } else if (value instanceof scala.Function21) {
+            builder.addType("scala.Function21");
             @SuppressWarnings("unchecked")
             scala.Function21<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function21<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19], args[20]));
         } else if (value instanceof scala.Function22) {
+            builder.addType("scala.Function22");
             @SuppressWarnings("unchecked")
             scala.Function22<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object> fn = (scala.Function22<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>) value;
             return toPyCFunction(args -> fn.apply(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18], args[19], args[20], args[21]));
         }
-        throw new PythonException("Unsupported Java type. value = " + value);
+        builder.addType(value.getClass().getName() + "  <- Unsupported");
+        throw new PythonException("Cannot convert the Java object to a Python object.\n" +
+                "\nValue type tree\n" + builder.toString() +
+                "\nvalue = " + value);
     }
 
     private static PyObject toPyCFunction(Function<Object[], Object> fn) {
@@ -775,7 +857,9 @@ public class Python {
                     for (int i = 0; i < objs.length; i++) {
                         objs[i] = toJava(PyTuple_GetItem(args, i));
                     }
-                    return toPyObject(fn.apply(objs));
+
+                    TypeTreeBuilder builder = new TypeTreeBuilder(1);
+                    return toPyObject(fn.apply(objs), builder);
                 } catch (Throwable e) {
                     e.printStackTrace();
 

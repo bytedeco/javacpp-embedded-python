@@ -109,6 +109,36 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ns] |
 | scala.Function0 - Function22 | built-in global Python function |
 
+### Value type tree
+
+If the value conversion fails, its value type tree is included in the Exception message.
+
+For example, for this Java code,
+
+```Java
+HashMap<String, Object> map = new HashMap<>();
+map.put("a", Arrays.asList(1, 2));
+map.put("b", UUID.randomUUID());
+Python.put("v", map);
+```
+
+you get this message. Because UUID is unsupported, you have to convert it to a String.
+
+```
+org.bytedeco.embeddedpython.PythonException: Cannot convert the Java object to a Python object.
+
+Value type tree
+  Map
+    Map.Entry
+      String
+      Iterable(java.util.Arrays$ArrayList)
+        Integer
+        Integer
+    Map.Entry
+      String
+      java.util.UUID  <- Unsupported
+```
+
 ## Exceptions
 
 ### Python to Java
