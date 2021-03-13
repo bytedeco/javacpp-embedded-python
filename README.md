@@ -72,7 +72,7 @@ Pip.install("pandas");
 | str | String |
 | bytes<br>bytearray | byte[] |
 | Tuple<br>List | Object[] |
-| Dict | Map |
+| Dict | java.util.Map |
 | ndarray np.int8 | NpNdarrayByte |
 | ndarray np.bool8 | NpNdarrayBoolean |
 | ndarray np.int16 | NpNdarrayShort |
@@ -96,7 +96,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | Instant | np.datetime64[ns] |
 | String | str |
 | Object[]<br>Iterable | List |
-| Map | Dict |
+| java.util.Map<br>scala.collection.Map | Dict |
 | byte[] | bytes |
 | boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |
 | NpNdarrayByte | np.ndarray, dtype=np.int8 |

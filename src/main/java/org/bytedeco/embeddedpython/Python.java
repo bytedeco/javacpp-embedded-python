@@ -139,7 +139,7 @@ public class Python {
      * <tr><td>bytearray</td><td>byte[]</td></tr>
      * <tr><td>Tuple</td><td>Object[]</td></tr>
      * <tr><td>List</td><td>Object[]</td></tr>
-     * <tr><td>Dict</td><td>Map</td></tr>
+     * <tr><td>Dict</td><td>java.util.Map</td></tr>
      * <tr><td>scalar np.bool8</td><td>boolean</td></tr>
      * <tr><td>scalar np.int8</td><td>byte</td></tr>
      * <tr><td>scalar np.int16</td><td>short</td></tr>
@@ -198,7 +198,8 @@ public class Python {
      * <tr><td>String</td><td>str</td></tr>
      * <tr><td>Iterable</td><td>List</td></tr>
      * <tr><td>Object[]</td><td>List</td></tr>
-     * <tr><td>Map</td><td>Dict</td></tr>
+     * <tr><td>java.util.Map</td><td>Dict</td></tr>
+     * <tr><td>scala.collection.Map</td><td>Dict</td></tr>
      * <tr><td>byte[]</td><td>bytes</td></tr>
      * <tr><td>boolean[]</td><td>np.ndarray, dtype=np.bool8</td></tr>
      * <tr><td>short[]</td><td>np.ndarray, dtype=np.int16</td></tr>
@@ -647,6 +648,15 @@ public class Python {
             for (Object key : map.keySet()) {
                 PyDict_SetItem(obj, toPyObject(key), toPyObject(map.get(key)));
             }
+            return obj;
+        } else if (value instanceof scala.collection.Map) {
+            @SuppressWarnings("unchecked")
+            scala.collection.Map<Object, Object> map = (scala.collection.Map<Object, Object>) value;
+            PyObject obj = PyDict_New();
+            map.foreachEntry((key, v) -> {
+                PyDict_SetItem(obj, toPyObject(key), toPyObject(v));
+                return null;
+            });
             return obj;
         } else if (value instanceof Object[]) {
             Object[] ary = (Object[]) value;
