@@ -71,8 +71,7 @@ Pip.install("pandas");
 | scalar np.datetime64[W, D, h, m, s, ms, us, or ns] | Instant |
 | str | String |
 | bytes<br>bytearray | byte[] |
-| Tuple<br>List | Object[] |
-| Dict | java.util.Map |
+| Dict | HashMap |
 | ndarray np.int8 | NpNdarrayByte |
 | ndarray np.bool8 | NpNdarrayBoolean |
 | ndarray np.int16 | NpNdarrayShort |
@@ -82,6 +81,7 @@ Pip.install("pandas");
 | ndarray np.float32 | NpNdarrayFloat |
 | ndarray np.float64 | NpNdarrayDouble |
 | ndarray np.datetime64[W, D, h, m, s, ms, us, or ns] | NpNdarrayInstant |
+| iterable | ArrayList |
 
 If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')```.
 

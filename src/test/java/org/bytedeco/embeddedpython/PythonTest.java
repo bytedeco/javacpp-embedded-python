@@ -33,17 +33,17 @@ public class PythonTest {
     @Test
     public void testStringArray() {
         Python.put("v", new String[]{"foo", "bar"});
-        Object[] v = Python.get("v");
-        assertEquals("foo", v[0]);
-        assertEquals("bar", v[1]);
+        ArrayList<String> v = Python.get("v");
+        assertEquals("foo", v.get(0));
+        assertEquals("bar", v.get(1));
     }
 
     @Test
     public void testIterable() {
         Python.put("v", Arrays.asList("foo", 123));
-        Object[] v = Python.get("v");
-        assertEquals("foo", v[0]);
-        assertEquals(123L, v[1]);
+        ArrayList<Object> v = Python.get("v");
+        assertEquals("foo", v.get(0));
+        assertEquals(123L, v.get(1));
     }
 
     @Test
@@ -53,10 +53,10 @@ public class PythonTest {
         map1.put("b", Arrays.asList(3, 4));
         Python.put("v", map1);
 
-        HashMap<String, Object[]> map2 = Python.get("v");
+        HashMap<String, ArrayList<Long>> map2 = Python.get("v");
         assertEquals(map1.keySet(), map2.keySet());
-        assertArrayEquals(new Object[]{1L, 2L}, map2.get("a"));
-        assertArrayEquals(new Object[]{3L, 4L}, map2.get("b"));
+        assertEquals(Arrays.asList(1L, 2L), map2.get("a"));
+        assertEquals(Arrays.asList(3L, 4L), map2.get("b"));
     }
 
     @Test
@@ -221,6 +221,18 @@ public class PythonTest {
             Python.put("v", map);
         } catch (PythonException e) {
             e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Test(expected = PythonException.class)
+    public void testUnsupportedPythonType1() {
+        try {
+            Python.exec("import uuid\nv = uuid.uuid4()\n");
+            Python.get("v");
+        } catch (PythonException e) {
+            e.printStackTrace();
+            assertEquals(3L, (long) Python.eval("1 + 2"));
             throw e;
         }
     }

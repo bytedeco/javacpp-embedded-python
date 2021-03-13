@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -134,11 +131,6 @@ public class Python {
      * <tr><td>int</td><td>long</td></tr>
      * <tr><td>float</td><td>double</td></tr>
      * <tr><td>str</td><td>String</td></tr>
-     * <tr><td>bytes</td><td>byte[]</td></tr>
-     * <tr><td>bytearray</td><td>byte[]</td></tr>
-     * <tr><td>Tuple</td><td>Object[]</td></tr>
-     * <tr><td>List</td><td>Object[]</td></tr>
-     * <tr><td>Dict</td><td>java.util.Map</td></tr>
      * <tr><td>scalar np.bool8</td><td>boolean</td></tr>
      * <tr><td>scalar np.int8</td><td>byte</td></tr>
      * <tr><td>scalar np.int16</td><td>short</td></tr>
@@ -148,6 +140,9 @@ public class Python {
      * <tr><td>scalar np.float32</td><td>float</td></tr>
      * <tr><td>scalar np.float64</td><td>double</td></tr>
      * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instant</td></tr>
+     * <tr><td>bytes</td><td>byte[]</td></tr>
+     * <tr><td>bytearray</td><td>byte[]</td></tr>
+     * <tr><td>Dict</td><td>HashMap</td></tr>
      * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
      * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
      * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
@@ -157,6 +152,7 @@ public class Python {
      * <tr><td>ndarray np.float32</td><td>NpNdarrayFloat</td></tr>
      * <tr><td>ndarray np.float64</td><td>NpNdarrayDouble</td></tr>
      * <tr><td>ndarray np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>NpNdarrayInstant</td></tr>
+     * <tr><td>iterable</td><td>ArrayList</td></tr>
      * </tbody>
      * </table>
      *
@@ -247,8 +243,6 @@ public class Python {
     private static final PyTypeObject unicodeType = PyUnicode_Type();
     private static final PyTypeObject bytesType = PyBytes_Type();
     private static final PyTypeObject byteArrayType = PyByteArray_Type();
-    private static final PyTypeObject tupleType = PyTuple_Type();
-    private static final PyTypeObject listType = PyList_Type();
     private static final PyTypeObject dictType = PyDict_Type();
     private static final PyTypeObject boolArrType = PyBoolArrType_Type();
     private static final PyTypeObject byteArrType = PyByteArrType_Type();
@@ -262,6 +256,7 @@ public class Python {
     private static final PyTypeObject arrayType = PyArray_Type();
 
     private static Object toJava(PyObject obj) {
+        PyObject iterator;
         PyTypeObject t = obj.ob_type();
         if (t.equals(noneType)) {
             return null;
@@ -273,37 +268,6 @@ public class Python {
             return PyFloat_AsDouble(obj);
         } else if (t.equals(unicodeType)) {
             return new BytePointer(PyUnicode_AsUTF8(obj)).getString(UTF_8);
-        } else if (t.equals(bytesType)) {
-            byte[] ary = new byte[lengthToInt(PyBytes_Size(obj))];
-            new BytePointer(PyBytes_AsString(obj)).get(ary);
-            return ary;
-        } else if (t.equals(byteArrayType)) {
-            byte[] ary = new byte[lengthToInt(PyByteArray_Size(obj))];
-            new BytePointer(PyByteArray_AsString(obj)).get(ary);
-            return ary;
-        } else if (t.equals(tupleType)) {
-            Object[] ary = new Object[lengthToInt(PyTuple_Size(obj))];
-            for (int i = 0; i < ary.length; i++) {
-                ary[i] = toJava(PyTuple_GetItem(obj, i));
-            }
-            return ary;
-        } else if (t.equals(listType)) {
-            Object[] ary = new Object[lengthToInt(PyList_Size(obj))];
-            for (int i = 0; i < ary.length; i++) {
-                ary[i] = toJava(PyList_GetItem(obj, i));
-            }
-            return ary;
-        } else if (t.equals(dictType)) {
-            SizeTPointer pos = new SizeTPointer(1).put(0);
-            HashMap<Object, Object> map = new HashMap<>();
-            while (true) {
-                PyObject key = new PyObject();
-                PyObject value = new PyObject();
-                int ok = PyDict_Next(obj, pos, key, value);
-                if (ok == 0) break;
-                map.put(toJava(key), toJava(value));
-            }
-            return map;
         } else if (t.equals(boolArrType)) {
             return new PyBoolScalarObject(obj).obval() != 0;
         } else if (t.equals(byteArrType)) {
@@ -338,15 +302,34 @@ public class Python {
                     return Instant.ofEpochMilli(datetimeScalarObj.obval());
                 case NPY_FR_us:
                     return Instant.ofEpochSecond(
-                            datetimeScalarObj.obval() / (1000L * 1000L),
-                            datetimeScalarObj.obval() % (1000L * 1000L));
+                            datetimeScalarObj.obval() / 1000_000L,
+                            datetimeScalarObj.obval() % 1000_000L);
                 case NPY_FR_ns:
                     return Instant.ofEpochSecond(
-                            datetimeScalarObj.obval() / (1000L * 1000L * 1000L),
-                            datetimeScalarObj.obval() % (1000L * 1000L * 1000L));
+                            datetimeScalarObj.obval() / 1000_000_000L,
+                            datetimeScalarObj.obval() % 1000_000_000L);
                 default:
                     throw new RuntimeException("Unsupported datetime unit. datetimteUnit = " + datetimteUnit);
             }
+        } else if (t.equals(bytesType)) {
+            byte[] ary = new byte[lengthToInt(PyBytes_Size(obj))];
+            new BytePointer(PyBytes_AsString(obj)).get(ary);
+            return ary;
+        } else if (t.equals(byteArrayType)) {
+            byte[] ary = new byte[lengthToInt(PyByteArray_Size(obj))];
+            new BytePointer(PyByteArray_AsString(obj)).get(ary);
+            return ary;
+        } else if (t.equals(dictType)) {
+            SizeTPointer pos = new SizeTPointer(1).put(0);
+            HashMap<Object, Object> map = new HashMap<>();
+            while (true) {
+                PyObject key = new PyObject();
+                PyObject value = new PyObject();
+                int ok = PyDict_Next(obj, pos, key, value);
+                if (ok == 0) break;
+                map.put(toJava(key), toJava(value));
+            }
+            return map;
         } else if (t.equals(arrayType)) {
             PyArrayObject aryObj = new PyArrayObject(obj);
             int ndim = PyArray_NDIM(aryObj);
@@ -482,6 +465,23 @@ public class Python {
                     return new NpNdarrayInstant(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                 }
             }
+        } else if ((iterator = getIter(obj)) != null) {
+            ArrayList<Object> list;
+            try {
+                list = new ArrayList<>();
+                while (true) {
+                    PyObject item = PyIter_Next(iterator);
+                    try {
+                        if (item == null) break;
+                        list.add(toJava(item));
+                    } finally {
+                        Py_DecRef(item);
+                    }
+                }
+            } finally {
+                Py_DecRef(iterator);
+            }
+            return list;
         }
         throw new PythonException("Cannot convert the Python object to a Java object.");
     }
@@ -890,5 +890,16 @@ public class Python {
 
     private static int[] toIntArrayDiv(long[] longAry, int v) {
         return Arrays.stream(longAry).mapToInt(x -> (int) (x / v)).toArray();
+    }
+
+    /**
+     * Don't forget to call Py_DecRef().
+     */
+    private static PyObject getIter(PyObject obj) {
+        PyObject iterator = PyObject_GetIter(obj);
+        if (iterator == null) {
+            PyErr_Clear();
+        }
+        return iterator;
     }
 }
