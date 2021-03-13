@@ -99,7 +99,8 @@ public class Python {
                         throw new PythonException("PyEval_EvalCode() failed. src = " + src);
                     }
                 }
-                return (T) toJava(obj);
+                TypeTreeBuilder builder = new TypeTreeBuilder(1);
+                return (T) toJava(obj, builder);
             } finally {
                 Py_DecRef(obj);
             }
@@ -142,7 +143,7 @@ public class Python {
      * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instant</td></tr>
      * <tr><td>bytes</td><td>byte[]</td></tr>
      * <tr><td>bytearray</td><td>byte[]</td></tr>
-     * <tr><td>Dict</td><td>HashMap</td></tr>
+     * <tr><td>dict</td><td>HashMap</td></tr>
      * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
      * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
      * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
@@ -164,7 +165,8 @@ public class Python {
      */
     @SuppressWarnings("unchecked")
     public synchronized static <T> T get(String name) {
-        return (T) toJava(getPyObject(name));
+        TypeTreeBuilder builder = new TypeTreeBuilder(1);
+        return (T) toJava(getPyObject(name), builder);
     }
 
     private static PyObject getPyObject(String name) {
@@ -191,10 +193,6 @@ public class Python {
      * <tr><td>double</td><td>float</td></tr>
      * <tr><td>Instant</td><td>np.datetime64[ns]</td></tr>
      * <tr><td>String</td><td>str</td></tr>
-     * <tr><td>Iterable</td><td>List</td></tr>
-     * <tr><td>Object[]</td><td>List</td></tr>
-     * <tr><td>java.util.Map</td><td>Dict</td></tr>
-     * <tr><td>scala.collection.Map</td><td>Dict</td></tr>
      * <tr><td>byte[]</td><td>bytes</td></tr>
      * <tr><td>boolean[]</td><td>np.ndarray, dtype=np.bool8</td></tr>
      * <tr><td>short[]</td><td>np.ndarray, dtype=np.int16</td></tr>
@@ -213,6 +211,10 @@ public class Python {
      * <tr><td>NpNdarrayFloat</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>NpNdarrayDouble</td><td>np.ndarray, dtype=np.float64</td></tr>
      * <tr><td>NpNdarrayInstant</td><td>np.ndarray, dtype=np.datetime64[ns]</td></tr>
+     * <tr><td>java.util.Map</td><td>dict</td></tr>
+     * <tr><td>scala.collection.Map</td><td>dict</td></tr>
+     * <tr><td>Object[]</td><td>list</td></tr>
+     * <tr><td>Iterable</td><td>list</td></tr>
      * <tr><td>scala.Function0 - Function22</td><td>built-in global Python function</td></tr>
      * </tbody>
      * </table>
@@ -255,71 +257,99 @@ public class Python {
     private static final PyTypeObject datetimeArrType = PyDatetimeArrType_Type();
     private static final PyTypeObject arrayType = PyArray_Type();
 
-    private static Object toJava(PyObject obj) {
+    private static Object toJava(PyObject obj, TypeTreeBuilder builder) {
         PyObject iterator;
         PyTypeObject t = obj.ob_type();
         if (t.equals(noneType)) {
+            builder.addType("None");
             return null;
         } else if (t.equals(boolType)) {
+            builder.addType("bool");
             return PyLong_AsLong(obj) != 0;
         } else if (t.equals(longType)) {
+            builder.addType("int");
             return PyLong_AsLong(obj);
         } else if (t.equals(floatType)) {
+            builder.addType("float");
             return PyFloat_AsDouble(obj);
         } else if (t.equals(unicodeType)) {
+            builder.addType("str");
             return new BytePointer(PyUnicode_AsUTF8(obj)).getString(UTF_8);
         } else if (t.equals(boolArrType)) {
+            builder.addType("np.bool8");
             return new PyBoolScalarObject(obj).obval() != 0;
         } else if (t.equals(byteArrType)) {
+            builder.addType("np.int8");
             return new PyByteScalarObject(obj).obval();
         } else if (t.equals(ushortArrType)) {
+            builder.addType("np.uint8");
             return (char) (new PyUShortScalarObject(obj).obval());
         } else if (t.equals(shortArrType)) {
+            builder.addType("np.int16");
             return new PyShortScalarObject(obj).obval();
         } else if (t.equals(intArrType)) {
+            builder.addType("np.int32");
             return new PyIntScalarObject(obj).obval();
         } else if (t.equals(longArrType)) {
+            builder.addType("np.int64");
             return new PyLongScalarObject(obj).obval();
         } else if (t.equals(floatArrType)) {
+            builder.addType("np.float32");
             return new PyFloatScalarObject(obj).obval();
         } else if (t.equals(doubleArrType)) {
+            builder.addType("np.float64");
             return new PyDoubleScalarObject(obj).obval();
         } else if (t.equals(datetimeArrType)) {
             PyDatetimeScalarObject datetimeScalarObj = new PyDatetimeScalarObject(obj);
             int datetimteUnit = datetimeScalarObj.obmeta().base();
             switch (datetimteUnit) {
                 case NPY_FR_W:
+                    builder.addType("np.datetime64[W]");
                     return Instant.ofEpochSecond(datetimeScalarObj.obval() * (7L * 24L * 60L * 60L));
                 case NPY_FR_D:
+                    builder.addType("np.datetime64[D]");
                     return Instant.ofEpochSecond(datetimeScalarObj.obval() * (24L * 60L * 60L));
                 case NPY_FR_h:
+                    builder.addType("np.datetime64[h]");
                     return Instant.ofEpochSecond(datetimeScalarObj.obval() * (60L * 60L));
                 case NPY_FR_m:
+                    builder.addType("np.datetime64[m]");
                     return Instant.ofEpochSecond(datetimeScalarObj.obval() * 60L);
                 case NPY_FR_s:
+                    builder.addType("np.datetime64[s]");
                     return Instant.ofEpochSecond(datetimeScalarObj.obval());
                 case NPY_FR_ms:
+                    builder.addType("np.datetime64[ms]");
                     return Instant.ofEpochMilli(datetimeScalarObj.obval());
                 case NPY_FR_us:
+                    builder.addType("np.datetime64[us]");
                     return Instant.ofEpochSecond(
                             datetimeScalarObj.obval() / 1000_000L,
                             datetimeScalarObj.obval() % 1000_000L);
                 case NPY_FR_ns:
+                    builder.addType("np.datetime64[ns]");
                     return Instant.ofEpochSecond(
                             datetimeScalarObj.obval() / 1000_000_000L,
                             datetimeScalarObj.obval() % 1000_000_000L);
                 default:
-                    throw new RuntimeException("Unsupported datetime unit. datetimteUnit = " + datetimteUnit);
+                    builder.addType("np.datetime64[???]  <- Unsupported datetime unit " + datetimteUnit);
+                    throw new PythonException("Cannot convert the Python object to a Java object.\n" +
+                            "\nValue type tree\n" + builder.toString());
             }
         } else if (t.equals(bytesType)) {
+            builder.addType("bytes");
             byte[] ary = new byte[lengthToInt(PyBytes_Size(obj))];
             new BytePointer(PyBytes_AsString(obj)).get(ary);
             return ary;
         } else if (t.equals(byteArrayType)) {
+            builder.addType("bytearray");
             byte[] ary = new byte[lengthToInt(PyByteArray_Size(obj))];
             new BytePointer(PyByteArray_AsString(obj)).get(ary);
             return ary;
         } else if (t.equals(dictType)) {
+            builder.addType("dict");
+            builder.tab++;
+
             SizeTPointer pos = new SizeTPointer(1).put(0);
             HashMap<Object, Object> map = new HashMap<>();
             while (true) {
@@ -327,8 +357,14 @@ public class Python {
                 PyObject value = new PyObject();
                 int ok = PyDict_Next(obj, pos, key, value);
                 if (ok == 0) break;
-                map.put(toJava(key), toJava(value));
+
+                builder.addType("item");
+                builder.tab++;
+                map.put(toJava(key, builder), toJava(value, builder));
+                builder.tab--;
             }
+
+            builder.tab--;
             return map;
         } else if (t.equals(arrayType)) {
             PyArrayObject aryObj = new PyArrayObject(obj);
@@ -344,30 +380,35 @@ public class Python {
 
             switch ((int) aryObj.descr().type()) {
                 case NPY_BOOLLTR: {
+                    builder.addType("np.ndarray(dtype=np.bool8)");
                     BooleanPointer dataPtr = new BooleanPointer(PyArray_BYTES(aryObj));
                     boolean[] data = new boolean[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayBoolean(data, toIntArray(shape), toIntArray(strides));
                 }
                 case NPY_BYTELTR: {
+                    builder.addType("np.ndarray(dtype=np.int8)");
                     BytePointer dataPtr = new BytePointer(PyArray_BYTES(aryObj));
                     byte[] data = new byte[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayByte(data, toIntArray(shape), toIntArray(strides));
                 }
                 case NPY_USHORTLTR: {
+                    builder.addType("np.ndarray(dtype=np.uint16)");
                     CharPointer dataPtr = new CharPointer(PyArray_BYTES(aryObj));
                     char[] data = new char[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayChar(data, toIntArray(shape), toIntArrayDiv(strides, 2));
                 }
                 case NPY_SHORTLTR: {
+                    builder.addType("np.ndarray(dtype=np.int16)");
                     ShortPointer dataPtr = new ShortPointer(PyArray_BYTES(aryObj));
                     short[] data = new short[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayShort(data, toIntArray(shape), toIntArrayDiv(strides, 2));
                 }
                 case NPY_INTLTR: {
+                    builder.addType("np.ndarray(dtype=np.int32)");
                     IntPointer dataPtr = new IntPointer(PyArray_BYTES(aryObj));
                     int[] data = new int[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
@@ -376,32 +417,39 @@ public class Python {
                 case NPY_LONGLTR: {
                     int itemsize = (int) PyArray_ITEMSIZE(aryObj);
                     if (itemsize == 4) {
+                        builder.addType("np.ndarray(dtype=np.int32)");
                         IntPointer dataPtr = new IntPointer(PyArray_BYTES(aryObj));
                         int[] data = new int[lengthToInt(PyArray_Size(aryObj))];
                         dataPtr.get(data);
                         return new NpNdarrayInt(data, toIntArray(shape), toIntArrayDiv(strides, 4));
                     } else if (itemsize == 8) {
+                        builder.addType("np.ndarray(dtype=np.int64)");
                         LongPointer dataPtr = new LongPointer(PyArray_BYTES(aryObj));
                         long[] data = new long[lengthToInt(PyArray_Size(aryObj))];
                         dataPtr.get(data);
                         return new NpNdarrayLong(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                     } else {
-                        throw new RuntimeException("Unsupported itemsize for long. itemsize = " + itemsize);
+                        builder.addType("np.ndarray(dtype=???)  <- Unsupported itemsize " + itemsize);
+                        throw new PythonException("Cannot convert the Python object to a Java object.\n" +
+                                "\nValue type tree\n" + builder.toString());
                     }
                 }
                 case NPY_LONGLONGLTR: {
+                    builder.addType("np.ndarray(dtype=np.int64)");
                     LongPointer dataPtr = new LongPointer(PyArray_BYTES(aryObj));
                     long[] data = new long[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayLong(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                 }
                 case NPY_FLOATLTR: {
+                    builder.addType("np.ndarray(dtype=np.float32)");
                     FloatPointer dataPtr = new FloatPointer(PyArray_BYTES(aryObj));
                     float[] data = new float[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
                     return new NpNdarrayFloat(data, toIntArray(shape), toIntArrayDiv(strides, 4));
                 }
                 case NPY_DOUBLELTR: {
+                    builder.addType("np.ndarray(dtype=np.float64)");
                     DoublePointer dataPtr = new DoublePointer(PyArray_BYTES(aryObj));
                     double[] data = new double[lengthToInt(PyArray_Size(aryObj))];
                     dataPtr.get(data);
@@ -416,74 +464,102 @@ public class Python {
                     int datetimteUnit = new PyArray_DatetimeDTypeMetaData(aryObj.descr().c_metadata()).meta().base();
                     switch (datetimteUnit) {
                         case NPY_FR_W:
+                            builder.addType("np.ndarray(dtype=np.datetime64[W])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(longAry[i] * (7L * 24L * 60L * 60L));
                             }
                             break;
                         case NPY_FR_D:
+                            builder.addType("np.ndarray(dtype=np.datetime64[D])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(longAry[i] * (24L * 60L * 60L));
                             }
                             break;
                         case NPY_FR_h:
+                            builder.addType("np.ndarray(dtype=np.datetime64[h])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(longAry[i] * (60L * 60L));
                             }
                             break;
                         case NPY_FR_m:
+                            builder.addType("np.ndarray(dtype=np.datetime64[m])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(longAry[i] * 60L);
                             }
                             break;
                         case NPY_FR_s:
+                            builder.addType("np.ndarray(dtype=np.datetime64[s])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(longAry[i]);
                             }
                             break;
                         case NPY_FR_ms:
+                            builder.addType("np.ndarray(dtype=np.datetime64[ms])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochMilli(longAry[i]);
                             }
                             break;
                         case NPY_FR_us:
+                            builder.addType("np.ndarray(dtype=np.datetime64[us])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(
-                                        longAry[i] / (1000L * 1000L),
-                                        longAry[i] % (1000L * 1000L));
+                                        longAry[i] / 1000_000L,
+                                        longAry[i] % 1000_000L);
                             }
                             break;
                         case NPY_FR_ns:
+                            builder.addType("np.ndarray(dtype=np.datetime64[ns])");
                             for (int i = 0; i < data.length; i++) {
                                 data[i] = Instant.ofEpochSecond(
-                                        longAry[i] / (1000L * 1000L * 1000L),
-                                        longAry[i] % (1000L * 1000L * 1000L));
+                                        longAry[i] / 1000_000_000L,
+                                        longAry[i] % 1000_000_000L);
                             }
                             break;
                         default:
-                            throw new RuntimeException("Unsupported datetime unit. datetimteUnit = " + datetimteUnit);
+                            builder.addType("np.ndarray(dtype=np.datetime64[???])  <- Unsupported datetime unit " + datetimteUnit);
+                            throw new PythonException("Cannot convert the Python object to a Java object.\n" +
+                                    "\nValue type tree\n" + builder.toString());
                     }
                     return new NpNdarrayInstant(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                 }
             }
         } else if ((iterator = getIter(obj)) != null) {
-            ArrayList<Object> list;
             try {
-                list = new ArrayList<>();
+                builder.addType("iterable(" + new BytePointer(t.tp_name()).getString(UTF_8) + ")");
+                builder.tab++;
+
+                ArrayList<Object> list = new ArrayList<>();
                 while (true) {
                     PyObject item = PyIter_Next(iterator);
                     try {
                         if (item == null) break;
-                        list.add(toJava(item));
+                        list.add(toJava(item, builder));
                     } finally {
                         Py_DecRef(item);
                     }
                 }
+
+                builder.tab--;
+                return list;
             } finally {
                 Py_DecRef(iterator);
             }
-            return list;
         }
-        throw new PythonException("Cannot convert the Python object to a Java object.");
+
+        builder.addType(new BytePointer(t.tp_name()).getString(UTF_8) + "  <- Unsupported");
+        PyObject valueStrObj = PyObject_Str(obj);
+        try {
+            String msgPrefix = "Cannot convert the Python object to a Java object.\n" +
+                    "\nValue type tree\n" + builder.toString();
+            if (valueStrObj == null) {
+                throw new PythonException(msgPrefix);
+            } else {
+                String valueStr = new BytePointer(PyUnicode_AsUTF8(valueStrObj)).getString(UTF_8);
+                throw new PythonException(msgPrefix + "\nvalue = " + valueStr);
+            }
+        } finally {
+            Py_DecRef(valueStrObj);
+        }
     }
 
     private static int lengthToInt(long length) {
@@ -853,13 +929,14 @@ public class Python {
             @Override
             public PyObject call(PyObject self, PyObject args) {
                 try {
+                    TypeTreeBuilder builderToJava = new TypeTreeBuilder(1);
                     Object[] objs = new Object[(int) PyTuple_Size(args)];
                     for (int i = 0; i < objs.length; i++) {
-                        objs[i] = toJava(PyTuple_GetItem(args, i));
+                        objs[i] = toJava(PyTuple_GetItem(args, i), builderToJava);
                     }
 
-                    TypeTreeBuilder builder = new TypeTreeBuilder(1);
-                    return toPyObject(fn.apply(objs), builder);
+                    TypeTreeBuilder builderToPython = new TypeTreeBuilder(1);
+                    return toPyObject(fn.apply(objs), builderToPython);
                 } catch (Throwable e) {
                     e.printStackTrace();
 

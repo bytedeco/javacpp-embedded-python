@@ -71,7 +71,7 @@ Pip.install("pandas");
 | scalar np.datetime64[W, D, h, m, s, ms, us, or ns] | Instant |
 | str | String |
 | bytes<br>bytearray | byte[] |
-| Dict | HashMap |
+| dict | HashMap |
 | ndarray np.int8 | NpNdarrayByte |
 | ndarray np.bool8 | NpNdarrayBoolean |
 | ndarray np.int16 | NpNdarrayShort |
@@ -95,8 +95,6 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | float<br>double | float |
 | Instant | np.datetime64[ns] |
 | String | str |
-| Object[]<br>Iterable | List |
-| java.util.Map<br>scala.collection.Map | Dict |
 | byte[] | bytes |
 | boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |
 | NpNdarrayByte | np.ndarray, dtype=np.int8 |
@@ -107,6 +105,8 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
 | Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ns] |
+| java.util.Map<br>scala.collection.Map | dict |
+| Object[]<br>Iterable | list |
 | scala.Function0 - Function22 | built-in global Python function |
 
 ### Value type tree

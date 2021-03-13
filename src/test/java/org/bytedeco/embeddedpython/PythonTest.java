@@ -236,4 +236,16 @@ public class PythonTest {
             throw e;
         }
     }
+
+    @Test(expected = PythonException.class)
+    public void testUnsupportedPythonType2() {
+        try {
+            Python.exec("import uuid\nv = dict(a=[1, 2], b=uuid.uuid4())\n");
+            Python.get("v");
+        } catch (PythonException e) {
+            e.printStackTrace();
+            assertEquals(3L, (long) Python.eval("1 + 2"));
+            throw e;
+        }
+    }
 }
