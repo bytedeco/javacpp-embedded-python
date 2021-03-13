@@ -185,7 +185,7 @@ public class Python {
      * <tr><td>long</td><td>int</td></tr>
      * <tr><td>float</td><td>float</td></tr>
      * <tr><td>double</td><td>float</td></tr>
-     * <tr><td>Instant</td><td>np.datetime64[ms]</td></tr>
+     * <tr><td>Instant</td><td>np.datetime64[ns]</td></tr>
      * <tr><td>String</td><td>str</td></tr>
      * <tr><td>Iterable</td><td>List</td></tr>
      * <tr><td>Object[]</td><td>List</td></tr>
@@ -198,7 +198,7 @@ public class Python {
      * <tr><td>long[]</td><td>np.ndarray, dtype=np.int64</td></tr>
      * <tr><td>float[]</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>double[]</td><td>np.ndarray, dtype=np.float64</td></tr>
-     * <tr><td>Instant[]</td><td>np.ndarray, dtype=np.datetime64[ms]</td></tr>
+     * <tr><td>Instant[]</td><td>np.ndarray, dtype=np.datetime64[ns]</td></tr>
      * <tr><td>NpNdarrayBoolean</td><td>np.ndarray, dtype=np.bool8</td></tr>
      * <tr><td>NpNdarrayByte</td><td>np.ndarray, dtype=np.int8</td></tr>
      * <tr><td>NpNdarrayShort</td><td>np.ndarray, dtype=np.int16</td></tr>
@@ -207,7 +207,7 @@ public class Python {
      * <tr><td>NpNdarrayLong</td><td>np.ndarray, dtype=np.int64</td></tr>
      * <tr><td>NpNdarrayFloat</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>NpNdarrayDouble</td><td>np.ndarray, dtype=np.float64</td></tr>
-     * <tr><td>NpNdarrayInstant</td><td>np.ndarray, dtype=np.datetime64[ms]</td></tr>
+     * <tr><td>NpNdarrayInstant</td><td>np.ndarray, dtype=np.datetime64[ns]</td></tr>
      * <tr><td>scala.Function0 - Function22</td><td>global Python function</td></tr>
      * </tbody>
      * </table>
@@ -506,11 +506,16 @@ public class Python {
         } else if (value instanceof Double) {
             return PyFloat_FromDouble((Double) value);
         } else if (value instanceof Instant) {
-            Instant instant = (Instant) value;
-            LongPointer ptr = new LongPointer(1).put(instant.toEpochMilli());
-            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
-            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
-            return PyArray_Scalar(ptr, descr, null);
+            try {
+                Instant instant = (Instant) value;
+                LongPointer ptr = new LongPointer(1).put(
+                        Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1000_000_000L), instant.getNano()));
+                PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+                new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ns).num(1);
+                return PyArray_Scalar(ptr, descr, null);
+            } catch (ArithmeticException e) {
+                throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
+            }
         } else if (value instanceof String) {
             return PyUnicode_FromString((String) value);
         } else if (value instanceof byte[]) {
@@ -552,12 +557,18 @@ public class Python {
             DoublePointer data = new DoublePointer(ary);
             return PyArray_New(arrayType, 1, dims, NPY_DOUBLE, null, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof Instant[]) {
-            Instant[] ary = (Instant[]) value;
-            SizeTPointer dims = new SizeTPointer(1).put(ary.length);
-            LongPointer data = new LongPointer(Arrays.stream(ary).mapToLong(Instant::toEpochMilli).toArray());
-            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
-            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
-            return PyArray_NewFromDescr(arrayType, descr, 1, dims, null, data, NPY_ARRAY_CARRAY, null);
+            try {
+                Instant[] ary = (Instant[]) value;
+                SizeTPointer dims = new SizeTPointer(1).put(ary.length);
+                LongPointer data = new LongPointer(Arrays.stream(ary).mapToLong(instant ->
+                        Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1000_000_000L), instant.getNano())
+                ).toArray());
+                PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+                new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ns).num(1);
+                return PyArray_NewFromDescr(arrayType, descr, 1, dims, null, data, NPY_ARRAY_CARRAY, null);
+            } catch (ArithmeticException e) {
+                throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
+            }
         } else if (value instanceof NpNdarrayByte) {
             NpNdarrayByte ndary = (NpNdarrayByte) value;
             SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
@@ -607,13 +618,19 @@ public class Python {
             DoublePointer data = new DoublePointer(ndary.data);
             return PyArray_New(arrayType, ndary.ndim(), dims, NPY_DOUBLE, strides, data, 0, NPY_ARRAY_CARRAY, null);
         } else if (value instanceof NpNdarrayInstant) {
-            NpNdarrayInstant ndary = (NpNdarrayInstant) value;
-            SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
-            SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
-            LongPointer data = new LongPointer(Arrays.stream(ndary.data).mapToLong(Instant::toEpochMilli).toArray());
-            PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
-            new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ms).num(1);
-            return PyArray_NewFromDescr(arrayType, descr, ndary.ndim(), dims, strides, data, NPY_ARRAY_CARRAY, null);
+            try {
+                NpNdarrayInstant ndary = (NpNdarrayInstant) value;
+                SizeTPointer dims = new SizeTPointer(toLongArray(ndary.shape));
+                SizeTPointer strides = new SizeTPointer(ndary.stridesInBytes());
+                LongPointer data = new LongPointer(Arrays.stream(ndary.data).mapToLong(instant ->
+                        Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1000_000_000L), instant.getNano())
+                ).toArray());
+                PyArray_Descr descr = PyArray_DescrNewFromType(NPY_DATETIME);
+                new PyArray_DatetimeDTypeMetaData(descr.c_metadata()).meta().base(NPY_FR_ns).num(1);
+                return PyArray_NewFromDescr(arrayType, descr, ndary.ndim(), dims, strides, data, NPY_ARRAY_CARRAY, null);
+            } catch (ArithmeticException e) {
+                throw new RuntimeException("Instant date range is outside of datetime64[ns] (1678-2262).", e);
+            }
         } else if (value instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<Object, Object> map = (Map<Object, Object>) value;

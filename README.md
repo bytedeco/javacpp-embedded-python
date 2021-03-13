@@ -93,9 +93,9 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | boolean | bool |
 | byte<br>short<br>char<br>int<br>long | int |
 | float<br>double | float |
-| Instant | np.datetime64[ms] |
+| Instant | np.datetime64[ns] |
 | String | str |
-| Object[]<br>Iterable | List |
+| Object[]<br>fmsIterable | List |
 | Map | Dict |
 | byte[] | bytes |
 | boolean[]<br>NpNdarrayBoolean | np.ndarray, dtype=np.bool8 |
@@ -106,7 +106,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | long[]<br>NpNdarrayLong | np.ndarray, dtype=np.int64 |
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
-| Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ms] |
+| Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ns] |
 | scala.Function0 - Function22 | global Python function |
 
 ## Exceptions
