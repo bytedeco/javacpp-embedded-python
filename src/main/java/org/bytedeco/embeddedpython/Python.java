@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.bytedeco.cpython.global.python.*;
@@ -667,11 +666,9 @@ public class Python {
             return obj;
         } else if (value instanceof Iterable) {
             @SuppressWarnings("unchecked")
-            Object[] ary = toObjectArray((Iterable<Object>) value);
-            PyObject obj = PyList_New(ary.length);
-            for (int i = 0; i < ary.length; i++) {
-                PyList_SetItem(obj, i, toPyObject(ary[i]));
-            }
+            Iterable<Object> iter = (Iterable<Object>) value;
+            PyObject obj = PyList_New(0);
+            iter.forEach(v -> PyList_Append(obj, toPyObject(v)));
             return obj;
         } else if (value instanceof scala.Function0) {
             @SuppressWarnings("unchecked")
@@ -809,9 +806,5 @@ public class Python {
 
     private static int[] toIntArrayDiv(long[] longAry, int v) {
         return Arrays.stream(longAry).mapToInt(x -> (int) (x / v)).toArray();
-    }
-
-    private static Object[] toObjectArray(Iterable<Object> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false).toArray();
     }
 }
