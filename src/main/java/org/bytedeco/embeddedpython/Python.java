@@ -522,6 +522,8 @@ public class Python {
                     }
                     return new NpNdarrayInstant(data, toIntArray(shape), toIntArrayDiv(strides, 8));
                 }
+                // default:
+                // goto iterable type
             }
         } else if ((iterator = getIter(obj)) != null) {
             try {

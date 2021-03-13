@@ -4,6 +4,27 @@ With this library, you can embed Python to your Java or Scala project.
 This library is a wrapper of javacpp-presets/cpython.
 The main purpose of this library is to use Python libraries from Java or Scala.
 
+## Apache Maven and sbt
+
+I have not uploaded this library to the Apache Maven Central Repository yet.
+You have to do ```mvn install```.
+
+Apache Maven
+
+```xml
+<dependency>
+    <groupId>org.bytedeco</groupId>
+    <artifactId>javacpp-embedded-python</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+sbt
+
+```scala
+libraryDependencies += "org.bytedeco" % "javacpp-embedded-python" % "1.0.0-SNAPSHOT"
+```
+
 ## Javadoc
 
 http://bytedeco.org/javacpp-embedded-python/apidocs/
@@ -83,7 +104,8 @@ Pip.install("pandas");
 | ndarray np.datetime64[W, D, h, m, s, ms, us, or ns] | NpNdarrayInstant |
 | iterable | ArrayList |
 
-If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')```.
+If you want to use Pandas DataFrames, please use ```DataFrame.reset_index().to_dict('list')```.
+If you are using datetimes in DataFrame, use ```DatetimeIndex.to_numpy()```.
 
 ### Java to Python
 
