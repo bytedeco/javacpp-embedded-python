@@ -184,4 +184,11 @@ public class PythonTest {
         Instant instant11 = Python.get("v");
         assertEquals(ndary4.data[0], instant11);
     }
+
+    @Test
+    public void testStdoutBuffering() {
+        System.out.println("1");
+        Python.exec("print(2)");
+        System.out.println("3");
+    }
 }

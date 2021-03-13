@@ -48,6 +48,7 @@ public class Python {
         Py_AddPath(cachePackages());
         Py_AddPath(org.bytedeco.numpy.presets.numpy.cachePackages());
 
+        Py_UnbufferedStdioFlag(1);
         Py_Initialize();
         _import_array();
 
