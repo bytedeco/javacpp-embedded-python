@@ -162,7 +162,7 @@ public class Python {
      * </table>
      *
      * @param name The variable name
-     * @param <T> The Java class after conversion from Python.
+     * @param <T>  The Java class after conversion from Python.
      * @return The Java object converted from the Python object.
      * @throws PythonException        If the value cannot convert to a Java object.
      * @throws NoSuchElementException If the variable does not exists.
@@ -217,7 +217,7 @@ public class Python {
      * <tr><td>NpNdarrayFloat</td><td>np.ndarray, dtype=np.float32</td></tr>
      * <tr><td>NpNdarrayDouble</td><td>np.ndarray, dtype=np.float64</td></tr>
      * <tr><td>NpNdarrayInstant</td><td>np.ndarray, dtype=np.datetime64[ns]</td></tr>
-     * <tr><td>scala.Function0 - Function22</td><td>global Python function</td></tr>
+     * <tr><td>scala.Function0 - Function22</td><td>built-in global Python function</td></tr>
      * </tbody>
      * </table>
      *
@@ -782,7 +782,10 @@ public class Python {
                 }
             }
         };
-        PyMethodDef methodDef = new PyMethodDef().ml_meth(pyFunc).ml_flags(METH_VARARGS);
+        PyMethodDef methodDef = new PyMethodDef().
+                ml_name(new BytePointer("org.bytedeco.embeddedpython")).
+                ml_meth(pyFunc).
+                ml_flags(METH_VARARGS);
         return PyCFunction_NewEx(methodDef, null, mainModule);
     }
 

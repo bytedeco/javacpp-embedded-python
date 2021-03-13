@@ -28,6 +28,8 @@ public class PythonTest {
         Python.put("f", (Function2<Long, Long, Long>) (a, b) -> a + b);
         long v = Python.eval("f(1, 2)");
         assertEquals(3L, v);
+
+        assertEquals("<built-in function org.bytedeco.embeddedpython>", Python.eval("str(f)"));
     }
 
     @Test

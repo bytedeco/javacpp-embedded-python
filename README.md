@@ -28,7 +28,7 @@ Get the global variable ```b```.
 long b = Python.get("b");
 ```
 
-You can add a global function to Python.
+You can add a built-in global function to Python.
 The ```scala.Function2``` interface comes from scala-java8-compat library.
 If you don't need the return value, please return ```null```.
 This will return ```None``` in Python.
@@ -107,7 +107,7 @@ If you want to use a Pandas DataFrame, please use ```DataFrame.to_dict('list')``
 | float[]<br>NpNdarrayFloat | np.ndarray, dtype=np.float32 |
 | double[]<br>NpNdarrayDouble | np.ndarray, dtype=np.float64 |
 | Instant[]<br>NpNdarrayInstant | np.ndarray, dtype=np.datetime64[ns] |
-| scala.Function0 - Function22 | global Python function |
+| scala.Function0 - Function22 | built-in global Python function |
 
 ## Exceptions
 
