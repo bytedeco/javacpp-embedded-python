@@ -74,6 +74,9 @@ public class Python {
     private static PyObject compile(String src) {
         PyObject co = Py_CompileString(src, "<string>", Py_eval_input);
         if (co == null) {
+            if (PyErr_Occurred() != null) {
+                PyErr_Print();
+            }
             throw new PythonException("Py_CompileString() failed. src = " + src);
         }
         return co;
@@ -93,8 +96,10 @@ public class Python {
                 if (obj == null) {
                     if (PyErr_Occurred() != null) {
                         PyErr_Print();
+                        throw new PythonException("PyEval_EvalCode() failed. An Error is thrown inside Python. src = " + src);
+                    } else {
+                        throw new PythonException("PyEval_EvalCode() failed. src = " + src);
                     }
-                    throw new PythonException("PyEval_EvalCode() failed. An Error is thrown inside Python. src = " + src);
                 }
                 return (T) toJava(obj);
             } finally {

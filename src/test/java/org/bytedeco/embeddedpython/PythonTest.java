@@ -132,6 +132,16 @@ public class PythonTest {
         Python.eval("a + 1");
     }
 
+    @Test(expected = PythonException.class)
+    public void testSyntaxErrorEval() {
+        Python.eval("print(Hello')");
+    }
+
+    @Test(expected = PythonException.class)
+    public void testSyntaxErrorExec() {
+        Python.exec("print(Hello')");
+    }
+
     @Test
     public void testLambdaException() {
         Python.put("f", (Function2<Long, Long, Long>) (a, b) -> {
