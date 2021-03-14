@@ -248,4 +248,19 @@ public class PythonTest {
             throw e;
         }
     }
+
+    @Test
+    public void testArgv() {
+        Python.exec("import sys");
+        ArrayList<String> argv = Python.eval("sys.argv");
+        assertEquals(1, argv.size());
+        assertEquals("", argv.get(0));
+    }
+
+    @Test
+    public void testSysExecutable() {
+        Python.exec("import sys");
+        String sysExecutable = Python.eval("sys.executable");
+        System.out.println(sysExecutable);
+    }
 }

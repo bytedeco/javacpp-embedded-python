@@ -44,8 +44,11 @@ public class Python {
         Py_AddPath(cachePackages());
         Py_AddPath(org.bytedeco.numpy.presets.numpy.cachePackages());
 
+        _Py_SetProgramFullPath(new CharPointer(Loader.load(org.bytedeco.cpython.python.class)));
+
         Py_UnbufferedStdioFlag(1);
         Py_Initialize();
+        PySys_SetArgvEx(1, new PointerPointer<CharPointer>(1).put(new CharPointer("")), 0);
         _import_array();
 
         Runtime.getRuntime().addShutdownHook(new Thread(python::Py_Finalize));
