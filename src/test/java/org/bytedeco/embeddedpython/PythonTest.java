@@ -17,7 +17,6 @@ public class PythonTest {
         Python.put("b", b);
         Python.exec("v = a / b");
         assertEquals(a / b, Python.get("v"), 1e-10);
-        Python.clear();
     }
 
     @Test
@@ -128,7 +127,6 @@ public class PythonTest {
 
     @Test
     public void testException() {
-        Python.clear();
         assertThrows(PythonException.class, () -> Python.eval("aaaa + 1"));
     }
 

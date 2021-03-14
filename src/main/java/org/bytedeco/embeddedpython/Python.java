@@ -8,6 +8,7 @@ import org.bytedeco.cpython.global.python;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.numpy.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,6 +45,11 @@ public class Python {
         Py_AddPath(cachePackages());
         Py_AddPath(org.bytedeco.numpy.presets.numpy.cachePackages());
 
+        String javaCppVersion = Loader.getVersion();
+        if (javaCppVersion.equals("1.5.3") || javaCppVersion.equals("1.5.4")) {
+            Py_AddPath(new File(cachePackages()[0], "site-packages"));
+        }
+
         _Py_SetProgramFullPath(new CharPointer(Loader.load(org.bytedeco.cpython.python.class)));
 
         Py_UnbufferedStdioFlag(1);
@@ -58,13 +64,6 @@ public class Python {
     private static final PyObject globals = PyModule_GetDict(mainModule);
 
     private Python() {
-    }
-
-    /**
-     * Delete all the global variables.
-     */
-    public synchronized static void clear() {
-        PyDict_Clear(globals);
     }
 
     /**

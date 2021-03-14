@@ -17,13 +17,22 @@ Apache Maven
     <artifactId>javacpp-embedded-python</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
+<dependency>
+    <groupId>org.bytedeco</groupId>
+    <artifactId>numpy-platform</artifactId>
+    <version>1.20.1-1.5.5</version>
+</dependency>
 ```
 
 sbt
 
 ```scala
 libraryDependencies += "org.bytedeco" % "javacpp-embedded-python" % "1.0.0-SNAPSHOT"
+libraryDependencies += "org.bytedeco" % "numpy-platform" % "1.20.1-1.5.5"
 ```
+
+JavaCPP 1.5.3 or later is supported.
+If you want to use Python 3.7, replace numpy-platform version to ```1.19.1-1.5.4```.
 
 ## Javadoc
 
