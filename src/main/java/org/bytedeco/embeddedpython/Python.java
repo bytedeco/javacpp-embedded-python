@@ -143,7 +143,7 @@ public class Python {
      * <tr><td>scalar np.datetime64[W, D, h, m, s, ms, us, or ns]</td><td>Instant</td></tr>
      * <tr><td>bytes</td><td>byte[]</td></tr>
      * <tr><td>bytearray</td><td>byte[]</td></tr>
-     * <tr><td>dict</td><td>HashMap</td></tr>
+     * <tr><td>dict</td><td>LinkedHashMap</td></tr>
      * <tr><td>ndarray np.bool8</td><td>NpNdarrayBoolean</td></tr>
      * <tr><td>ndarray np.int8</td><td>NpNdarrayByte</td></tr>
      * <tr><td>ndarray np.int16</td><td>NpNdarrayShort</td></tr>
@@ -351,7 +351,7 @@ public class Python {
             builder.tab++;
 
             SizeTPointer pos = new SizeTPointer(1).put(0);
-            HashMap<Object, Object> map = new HashMap<>();
+            LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
             while (true) {
                 PyObject key = new PyObject();
                 PyObject value = new PyObject();

@@ -48,12 +48,12 @@ public class PythonTest {
 
     @Test
     public void testMap() {
-        HashMap<String, List<Object>> map1 = new HashMap<>();
+        LinkedHashMap<String, List<Object>> map1 = new LinkedHashMap<>();
         map1.put("a", Arrays.asList(1, 2));
         map1.put("b", Arrays.asList(3, 4));
         Python.put("v", map1);
 
-        HashMap<String, ArrayList<Long>> map2 = Python.get("v");
+        LinkedHashMap<String, ArrayList<Long>> map2 = Python.get("v");
         assertEquals(map1.keySet(), map2.keySet());
         assertEquals(Arrays.asList(1L, 2L), map2.get("a"));
         assertEquals(Arrays.asList(3L, 4L), map2.get("b"));

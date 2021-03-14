@@ -94,7 +94,7 @@ If you want to use the local Python files, use ```sys.path.append("your_src_dir"
 | scalar np.datetime64[W, D, h, m, s, ms, us, or ns] | Instant |
 | str | String |
 | bytes<br>bytearray | byte[] |
-| dict | HashMap |
+| dict | LinkedHashMap |
 | ndarray np.int8 | NpNdarrayByte |
 | ndarray np.bool8 | NpNdarrayBoolean |
 | ndarray np.int16 | NpNdarrayShort |
