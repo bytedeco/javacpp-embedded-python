@@ -1,12 +1,12 @@
 package org.bytedeco.embeddedpython;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import scala.Function2;
 
 import java.time.Instant;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PythonTest {
     @Test
@@ -126,20 +126,20 @@ public class PythonTest {
         assertArrayEquals(new boolean[]{true, false}, npary.toArray());
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testException() {
         Python.clear();
-        Python.eval("a + 1");
+        assertThrows(PythonException.class, () -> Python.eval("aaaa + 1"));
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testSyntaxErrorEval() {
-        Python.eval("print(Hello')");
+        assertThrows(PythonException.class, () -> Python.eval("print(Hello')"));
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testSyntaxErrorExec() {
-        Python.exec("print(Hello')");
+        assertThrows(PythonException.class, () -> Python.exec("print(Hello')"));
     }
 
     @Test
@@ -202,51 +202,59 @@ public class PythonTest {
         System.out.println("3");
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testUnsupportedJavaType1() {
-        try {
-            Python.put("v", UUID.randomUUID());
-        } catch (PythonException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        assertThrows(PythonException.class, () -> {
+            try {
+                Python.put("v", UUID.randomUUID());
+            } catch (PythonException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        });
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testUnsupportedJavaType2() {
-        try {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("a", Arrays.asList(1, 2));
-            map.put("b", UUID.randomUUID());
-            Python.put("v", map);
-        } catch (PythonException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        assertThrows(PythonException.class, () -> {
+            try {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("a", Arrays.asList(1, 2));
+                map.put("b", UUID.randomUUID());
+                Python.put("v", map);
+            } catch (PythonException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        });
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testUnsupportedPythonType1() {
-        try {
-            Python.exec("import uuid\nv = uuid.uuid4()\n");
-            Python.get("v");
-        } catch (PythonException e) {
-            e.printStackTrace();
-            assertEquals(3L, (long) Python.eval("1 + 2"));
-            throw e;
-        }
+        assertThrows(PythonException.class, () -> {
+            try {
+                Python.exec("import uuid\nv = uuid.uuid4()\n");
+                Python.get("v");
+            } catch (PythonException e) {
+                e.printStackTrace();
+                assertEquals(3L, (long) Python.eval("1 + 2"));
+                throw e;
+            }
+        });
     }
 
-    @Test(expected = PythonException.class)
+    @Test
     public void testUnsupportedPythonType2() {
-        try {
-            Python.exec("import uuid\nv = dict(a=[1, 2], b=uuid.uuid4())\n");
-            Python.get("v");
-        } catch (PythonException e) {
-            e.printStackTrace();
-            assertEquals(3L, (long) Python.eval("1 + 2"));
-            throw e;
-        }
+        assertThrows(PythonException.class, () -> {
+            try {
+                Python.exec("import uuid\nv = dict(a=[1, 2], b=uuid.uuid4())\n");
+                Python.get("v");
+            } catch (PythonException e) {
+                e.printStackTrace();
+                assertEquals(3L, (long) Python.eval("1 + 2"));
+                throw e;
+            }
+        });
     }
 
     @Test
