@@ -74,6 +74,8 @@ If you need a Python library, please use the Pip class.
 Pip.install("pandas");
 ```
 
+If you want to use the local Python files, use ```sys.path.append("your_src_dir")``` in Python.
+
 ## Type mappings
 
 ### Python to Java
