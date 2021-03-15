@@ -183,3 +183,11 @@ and ```PythonException``` is thrown in Java.
 When Java code throws exceptions in the Java lambda,
 ```Throwable.printStackTrace()``` is called,
 and ```RuntimeError``` is thrown in Python.
+
+## Version matrix
+
+| javacpp-embedded-python | numpy-platform | CPython |
+|-----|-----|-----|
+|1.x.x|1.18.2-1.5.3|3.7.7|
+|1.x.x|1.19.1-1.5.4|3.7.9|
+|1.x.x|1.20.1-1.5.5|3.9.2|
