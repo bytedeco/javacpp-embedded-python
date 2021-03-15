@@ -144,7 +144,7 @@ If you are using datetimes in DataFrame, use ```DatetimeIndex.to_numpy()```.
 
 ### Value type tree
 
-If the value conversion fails, its value type tree is included in the Exception message.
+If the value type conversion fails, its value type tree is included in the Exception message.
 
 For example, for this Java code,
 
@@ -171,6 +171,14 @@ Value type tree
       String
       java.util.UUID  <- Unsupported
 ```
+
+### Tips
+
+Because Python is a duck typing language, the Python value type is unclear statically.
+For example, people don't care about the difference between ```int``` and ```np.int64``` scalar.
+Therefore, I recommend converting the Python value type
+before passing it to the Java side and making it clear statically.
+For example, use such as ```int()```, ```np.array()```, or ```bytes()```.
 
 ## Exceptions
 
