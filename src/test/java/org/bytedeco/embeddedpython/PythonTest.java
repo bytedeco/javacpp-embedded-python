@@ -1,6 +1,8 @@
 package org.bytedeco.embeddedpython;
 
 import org.junit.jupiter.api.Test;
+import scala.Function0;
+import scala.Function1;
 import scala.Function2;
 
 import java.time.Instant;
@@ -228,6 +230,19 @@ public class PythonTest {
     }
 
     @Test
+    public void testUnsupportedJavaType3() {
+        assertThrows(PythonException.class, () -> {
+            try {
+                Python.put("f", (Function0<UUID>) UUID::randomUUID);
+                Python.exec("f()");
+            } catch (PythonException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        });
+    }
+
+    @Test
     public void testUnsupportedPythonType1() {
         assertThrows(PythonException.class, () -> {
             try {
@@ -250,6 +265,19 @@ public class PythonTest {
             } catch (PythonException e) {
                 e.printStackTrace();
                 assertEquals(3L, (long) Python.eval("1 + 2"));
+                throw e;
+            }
+        });
+    }
+
+    @Test
+    public void testUnsupportedPythonType3() {
+        assertThrows(PythonException.class, () -> {
+            try {
+                Python.put("f", (Function1<UUID, Object>) (uuid) -> null);
+                Python.exec("import uuid\nf(uuid.uuid4())");
+            } catch (PythonException e) {
+                e.printStackTrace();
                 throw e;
             }
         });

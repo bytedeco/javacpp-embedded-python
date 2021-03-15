@@ -934,13 +934,20 @@ public class Python {
             public PyObject call(PyObject self, PyObject args) {
                 try {
                     TypeTreeBuilder builderToJava = new TypeTreeBuilder(1);
+                    builderToJava.addType("(arguments)");
+                    builderToJava.tab++;
                     Object[] objs = new Object[(int) PyTuple_Size(args)];
                     for (int i = 0; i < objs.length; i++) {
                         objs[i] = toJava(PyTuple_GetItem(args, i), builderToJava);
                     }
+                    builderToJava.tab--;
 
                     TypeTreeBuilder builderToPython = new TypeTreeBuilder(1);
-                    return toPyObject(fn.apply(objs), builderToPython);
+                    builderToPython.addType("(return value)");
+                    builderToPython.tab++;
+                    PyObject pyObject = toPyObject(fn.apply(objs), builderToPython);
+                    builderToPython.tab--;
+                    return pyObject;
                 } catch (Throwable e) {
                     e.printStackTrace();
 
