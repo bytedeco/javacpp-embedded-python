@@ -3,7 +3,7 @@ package org.bytedeco.embeddedpython;
 import java.util.Collections;
 
 class TypeTreeBuilder {
-    final StringBuilder stringBuilder = new StringBuilder();
+    private final StringBuilder stringBuilder = new StringBuilder();
     int tab;
 
     public TypeTreeBuilder(int tab) {
