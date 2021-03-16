@@ -297,4 +297,15 @@ public class PythonTest {
         String sysExecutable = Python.eval("sys.executable");
         System.out.println(sysExecutable);
     }
+
+    @Test
+    public void testOrderedDict() {
+        LinkedHashMap<String, Long> map1 = new LinkedHashMap<>();
+        map1.put("a", 1L);
+        map1.put("b", 2L);
+
+        Python.exec("from collections import OrderedDict");
+        LinkedHashMap<String, Long> map2 = Python.eval("OrderedDict(a=1, b=2)");
+        assertEquals(map1, map2);
+    }
 }

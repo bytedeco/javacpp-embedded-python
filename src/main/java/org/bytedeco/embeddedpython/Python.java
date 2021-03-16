@@ -20,6 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.bytedeco.cpython.global.python.*;
 import static org.bytedeco.cpython.helper.python.Py_AddPath;
 import static org.bytedeco.cpython.presets.python.cachePackages;
+import static org.bytedeco.embeddedpython.PyTypes.*;
 import static org.bytedeco.numpy.global.numpy.*;
 
 /**
@@ -240,41 +241,22 @@ public class Python {
         }
     }
 
-    private static final PyTypeObject noneType = _PyNone_Type();
-    private static final PyTypeObject boolType = PyBool_Type();
-    private static final PyTypeObject longType = PyLong_Type();
-    private static final PyTypeObject floatType = PyFloat_Type();
-    private static final PyTypeObject unicodeType = PyUnicode_Type();
-    private static final PyTypeObject bytesType = PyBytes_Type();
-    private static final PyTypeObject byteArrayType = PyByteArray_Type();
-    private static final PyTypeObject dictType = PyDict_Type();
-    private static final PyTypeObject boolArrType = PyBoolArrType_Type();
-    private static final PyTypeObject byteArrType = PyByteArrType_Type();
-    private static final PyTypeObject ushortArrType = PyUShortArrType_Type();
-    private static final PyTypeObject shortArrType = PyShortArrType_Type();
-    private static final PyTypeObject intArrType = PyIntArrType_Type();
-    private static final PyTypeObject longArrType = PyLongArrType_Type();
-    private static final PyTypeObject floatArrType = PyFloatArrType_Type();
-    private static final PyTypeObject doubleArrType = PyDoubleArrType_Type();
-    private static final PyTypeObject datetimeArrType = PyDatetimeArrType_Type();
-    private static final PyTypeObject arrayType = PyArray_Type();
-
     private static Object toJava(PyObject obj, TypeTreeBuilder builder) {
         PyObject iterator;
         PyTypeObject t = obj.ob_type();
-        if (t.equals(noneType)) {
+        if (PyNone_Check(obj)) {
             builder.addType("None");
             return null;
-        } else if (t.equals(boolType)) {
+        } else if (PyBool_Check(obj)) {
             builder.addType("bool");
             return PyLong_AsLong(obj) != 0;
-        } else if (t.equals(longType)) {
+        } else if (PyLong_Check(obj)) {
             builder.addType("int");
             return PyLong_AsLong(obj);
-        } else if (t.equals(floatType)) {
+        } else if (PyFloat_Check(obj)) {
             builder.addType("float");
             return PyFloat_AsDouble(obj);
-        } else if (t.equals(unicodeType)) {
+        } else if (PyUnicode_Check(obj)) {
             builder.addType("str");
             return new BytePointer(PyUnicode_AsUTF8(obj)).getString(UTF_8);
         } else if (t.equals(boolArrType)) {
@@ -338,17 +320,17 @@ public class Python {
                     throw new PythonException("Cannot convert the Python object to a Java object.\n" +
                             "\nValue type tree\n" + builder.toString());
             }
-        } else if (t.equals(bytesType)) {
+        } else if (PyBytes_Check(obj)) {
             builder.addType("bytes");
             byte[] ary = new byte[lengthToInt(PyBytes_Size(obj))];
             new BytePointer(PyBytes_AsString(obj)).get(ary);
             return ary;
-        } else if (t.equals(byteArrayType)) {
+        } else if (PyByteArray_Check(obj)) {
             builder.addType("bytearray");
             byte[] ary = new byte[lengthToInt(PyByteArray_Size(obj))];
             new BytePointer(PyByteArray_AsString(obj)).get(ary);
             return ary;
-        } else if (t.equals(dictType)) {
+        } else if (PyDict_Check(obj)) {
             builder.addType("dict");
             builder.tab++;
 
