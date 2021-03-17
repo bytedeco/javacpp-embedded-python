@@ -192,10 +192,22 @@ When Java code throws exceptions in the Java lambda,
 ```Throwable.printStackTrace()``` is called,
 and ```RuntimeError``` is thrown in Python.
 
+## Intel Math Kernel Library
+
+If you are using Intel CPU, add this dependency.
+
+```xml
+<dependency>
+    <groupId>org.bytedeco</groupId>
+    <artifactId>mkl-platform-redist</artifactId>
+    <version>2021.1-1.5.5</version>
+</dependency>
+```
+
 ## Version matrix
 
-| javacpp-embedded-python | numpy-platform | CPython |
-|-----|-----|-----|
-|1.x.x|1.18.2-1.5.3|3.7.7|
-|1.x.x|1.19.1-1.5.4|3.7.9|
-|1.x.x|1.20.1-1.5.5|3.9.2|
+| javacpp-embedded-python | [numpy-platform](https://mvnrepository.com/artifact/org.bytedeco/numpy-platform) | [mkl-platform-redist](https://mvnrepository.com/artifact/org.bytedeco/mkl-platform-redist) | [CPython](https://mvnrepository.com/artifact/org.bytedeco/cpython-platform) |
+|-----|-----|-----|-----|
+|1.x.x|1.18.2-1.5.3|2020.1-1.5.3|3.7.7|
+|1.x.x|1.19.1-1.5.4|2020.3-1.5.4|3.7.9|
+|1.x.x|1.20.1-1.5.5|2021.1-1.5.5|3.9.2|
