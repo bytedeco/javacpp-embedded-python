@@ -131,4 +131,12 @@
         <connection>scm:git:git://github.com/bytedeco/javacpp-embedded-python.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/bytedeco/javacpp-embedded-python.git</developerConnection>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/bytedeco/javacpp-embedded-python</url>
+        </repository>
+    </distributionManagement>
 </project>

@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.bytedeco.cpython.global.python.*;
+import static org.bytedeco.cpython.global.python.Py_DecodeLocale;
 import static org.bytedeco.cpython.helper.python.Py_AddPath;
 import static org.bytedeco.cpython.presets.python.cachePackages;
 import static org.bytedeco.embeddedpython.PyTypes.*;
@@ -51,11 +52,11 @@ public class Python {
             Py_AddPath(new File(cachePackages()[0], "site-packages"));
         }
 
-        _Py_SetProgramFullPath(new CharPointer(Loader.load(org.bytedeco.cpython.python.class)));
+        _Py_SetProgramFullPath(Py_DecodeLocale(Loader.load(org.bytedeco.cpython.python.class), null));
 
         Py_UnbufferedStdioFlag(1);
         Py_Initialize();
-        PySys_SetArgvEx(1, new PointerPointer<CharPointer>(1).put(new CharPointer("")), 0);
+        PySys_SetArgvEx(1, new PointerPointer<>(1).put(Py_DecodeLocale("", null)), 0);
         _import_array();
 
         Runtime.getRuntime().addShutdownHook(new Thread(python::Py_Finalize));
