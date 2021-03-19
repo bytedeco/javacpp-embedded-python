@@ -51,7 +51,7 @@ public class Pip {
      * @throws InterruptedException If the current thread is interrupted by another thread.
      */
     public static synchronized int uninstall(String... packages) throws IOException, InterruptedException {
-        return exec(concat(new String[]{python, "-m", "pip", "uninstall"}, packages));
+        return exec(concat(new String[]{python, "-m", "pip", "uninstall", "-y"}, packages));
     }
 
     private static int exec(String[] commands) throws IOException, InterruptedException {
