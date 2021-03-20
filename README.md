@@ -211,3 +211,24 @@ If you are using Intel CPU, add this dependency.
 |1.x.x|1.18.2-1.5.3|2020.1-1.5.3|3.7.7|
 |1.x.x|1.19.1-1.5.4|2020.3-1.5.4|3.7.9|
 |1.x.x|1.20.1-1.5.5|2021.1-1.5.5|3.9.2|
+
+## Linux problem
+
+Because javacpp-presets/cpython has not been built correctly on Linux, you have to rebuild it.
+You can do it by this if you are using Ubuntu 20.04.
+See also https://devguide.python.org/setup/#linux for other Linux distributions.
+Change ```1.5.5``` to your JavaCPP version.
+javacpp-presets/cpython forgets to do ```apt-get build-dep python3.8```.
+
+```bash
+echo 'deb-src http://archive.ubuntu.com/ubuntu/ focal main' | sudo tee -a /etc/apt/sources.list
+sudo apt update
+sudo apt-get build-dep python3.8
+sudo apt install maven openjdk-11-jdk
+
+git clone https://github.com/bytedeco/javacpp-presets.git
+cd javacpp-presets
+git checkout -b 1.5.5 refs/tags/1.5.5
+cd cpython
+mvn install
+```
