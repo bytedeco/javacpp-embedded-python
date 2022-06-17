@@ -12,13 +12,13 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>numpy</artifactId>
-            <version>1.18.2-1.5.3</version>
+            <version>1.22.2-1.5.7</version>
         </dependency>
 
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>numpy-platform</artifactId>
-            <version>1.18.2-1.5.3</version>
+            <version>1.22.2-1.5.7</version>
             <scope>test</scope>
         </dependency>
 
