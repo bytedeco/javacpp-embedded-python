@@ -2,6 +2,7 @@ package org.bytedeco.embeddedpython;
 
 import org.bytedeco.cpython.PyObject;
 import org.bytedeco.cpython.PyTypeObject;
+import org.bytedeco.cpython.global.python;
 
 import static org.bytedeco.cpython.global.python.*;
 import static org.bytedeco.numpy.global.numpy.*;
@@ -30,7 +31,7 @@ class PyTypes {
     }
 
     static PyTypeObject Py_TYPE(PyObject ob) {
-        return ob.ob_type();
+        return python.Py_TYPE(ob);
     }
 
     static boolean Py_IS_TYPE(PyObject ob, PyTypeObject type) {

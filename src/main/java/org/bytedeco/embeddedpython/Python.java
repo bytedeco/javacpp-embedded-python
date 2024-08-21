@@ -244,7 +244,7 @@ public class Python {
 
     private static Object toJava(PyObject obj, TypeTreeBuilder builder) {
         PyObject iterator;
-        PyTypeObject t = obj.ob_type();
+        PyTypeObject t = PyTypes.Py_TYPE(obj);
         if (PyNone_Check(obj)) {
             builder.addType("None");
             return null;
