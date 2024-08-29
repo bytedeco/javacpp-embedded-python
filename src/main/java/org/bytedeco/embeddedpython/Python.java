@@ -1,28 +1,157 @@
 package org.bytedeco.embeddedpython;
 
-import org.bytedeco.cpython.PyCFunction;
-import org.bytedeco.cpython.PyMethodDef;
-import org.bytedeco.cpython.PyObject;
-import org.bytedeco.cpython.PyTypeObject;
-import org.bytedeco.cpython.global.python;
-import org.bytedeco.javacpp.*;
-import org.bytedeco.numpy.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.bytedeco.cpython.global.python.METH_VARARGS;
+import static org.bytedeco.cpython.global.python.PyBool_FromLong;
+import static org.bytedeco.cpython.global.python.PyByteArray_AsString;
+import static org.bytedeco.cpython.global.python.PyByteArray_Size;
+import static org.bytedeco.cpython.global.python.PyBytes_AsString;
+import static org.bytedeco.cpython.global.python.PyBytes_FromStringAndSize;
+import static org.bytedeco.cpython.global.python.PyBytes_Size;
+import static org.bytedeco.cpython.global.python.PyCFunction_NewEx;
+import static org.bytedeco.cpython.global.python.PyConfig_Clear;
+import static org.bytedeco.cpython.global.python.PyConfig_InitPythonConfig;
+import static org.bytedeco.cpython.global.python.PyConfig_Read;
+import static org.bytedeco.cpython.global.python.PyDict_GetItemString;
+import static org.bytedeco.cpython.global.python.PyDict_New;
+import static org.bytedeco.cpython.global.python.PyDict_Next;
+import static org.bytedeco.cpython.global.python.PyDict_SetItem;
+import static org.bytedeco.cpython.global.python.PyDict_SetItemString;
+import static org.bytedeco.cpython.global.python.PyErr_Clear;
+import static org.bytedeco.cpython.global.python.PyErr_Occurred;
+import static org.bytedeco.cpython.global.python.PyErr_Print;
+import static org.bytedeco.cpython.global.python.PyErr_SetString;
+import static org.bytedeco.cpython.global.python.PyEval_EvalCode;
+import static org.bytedeco.cpython.global.python.PyExc_RuntimeError;
+import static org.bytedeco.cpython.global.python.PyFloat_AsDouble;
+import static org.bytedeco.cpython.global.python.PyFloat_FromDouble;
+import static org.bytedeco.cpython.global.python.PyImport_AddModule;
+import static org.bytedeco.cpython.global.python.PyIter_Next;
+import static org.bytedeco.cpython.global.python.PyList_Append;
+import static org.bytedeco.cpython.global.python.PyList_New;
+import static org.bytedeco.cpython.global.python.PyList_SetItem;
+import static org.bytedeco.cpython.global.python.PyLong_AsLong;
+import static org.bytedeco.cpython.global.python.PyLong_FromLong;
+import static org.bytedeco.cpython.global.python.PyModule_GetDict;
+import static org.bytedeco.cpython.global.python.PyObject_GetIter;
+import static org.bytedeco.cpython.global.python.PyObject_Str;
+import static org.bytedeco.cpython.global.python.PyRun_SimpleStringFlags;
+import static org.bytedeco.cpython.global.python.PyTuple_GetItem;
+import static org.bytedeco.cpython.global.python.PyTuple_Size;
+import static org.bytedeco.cpython.global.python.PyUnicode_AsUTF8;
+import static org.bytedeco.cpython.global.python.PyUnicode_FromString;
+import static org.bytedeco.cpython.global.python.PyWideStringList_Append;
+import static org.bytedeco.cpython.global.python.Py_CompileString;
+import static org.bytedeco.cpython.global.python.Py_DecRef;
+import static org.bytedeco.cpython.global.python.Py_DecodeLocale;
+import static org.bytedeco.cpython.global.python.Py_InitializeFromConfig;
+import static org.bytedeco.cpython.global.python.Py_eval_input;
+import static org.bytedeco.cpython.global.python._Py_NoneStruct;
+import static org.bytedeco.cpython.presets.python.cachePackages;
+import static org.bytedeco.embeddedpython.PyTypes.PyBool_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyByteArray_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyBytes_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyDict_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyFloat_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyLong_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyNone_Check;
+import static org.bytedeco.embeddedpython.PyTypes.PyUnicode_Check;
+import static org.bytedeco.embeddedpython.PyTypes.arrayType;
+import static org.bytedeco.embeddedpython.PyTypes.boolArrType;
+import static org.bytedeco.embeddedpython.PyTypes.byteArrType;
+import static org.bytedeco.embeddedpython.PyTypes.datetimeArrType;
+import static org.bytedeco.embeddedpython.PyTypes.doubleArrType;
+import static org.bytedeco.embeddedpython.PyTypes.floatArrType;
+import static org.bytedeco.embeddedpython.PyTypes.intArrType;
+import static org.bytedeco.embeddedpython.PyTypes.longArrType;
+import static org.bytedeco.embeddedpython.PyTypes.shortArrType;
+import static org.bytedeco.embeddedpython.PyTypes.ushortArrType;
+import static org.bytedeco.numpy.global.numpy.NPY_ARRAY_CARRAY;
+import static org.bytedeco.numpy.global.numpy.NPY_BOOL;
+import static org.bytedeco.numpy.global.numpy.NPY_BOOLLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_BYTE;
+import static org.bytedeco.numpy.global.numpy.NPY_BYTELTR;
+import static org.bytedeco.numpy.global.numpy.NPY_DATETIME;
+import static org.bytedeco.numpy.global.numpy.NPY_DATETIMELTR;
+import static org.bytedeco.numpy.global.numpy.NPY_DOUBLE;
+import static org.bytedeco.numpy.global.numpy.NPY_DOUBLELTR;
+import static org.bytedeco.numpy.global.numpy.NPY_FLOAT;
+import static org.bytedeco.numpy.global.numpy.NPY_FLOATLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_D;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_W;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_h;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_m;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_ms;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_ns;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_s;
+import static org.bytedeco.numpy.global.numpy.NPY_FR_us;
+import static org.bytedeco.numpy.global.numpy.NPY_INT;
+import static org.bytedeco.numpy.global.numpy.NPY_INTLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_LONGLONG;
+import static org.bytedeco.numpy.global.numpy.NPY_LONGLONGLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_LONGLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_SHORT;
+import static org.bytedeco.numpy.global.numpy.NPY_SHORTLTR;
+import static org.bytedeco.numpy.global.numpy.NPY_USHORT;
+import static org.bytedeco.numpy.global.numpy.NPY_USHORTLTR;
+import static org.bytedeco.numpy.global.numpy.PyArray_BYTES;
+import static org.bytedeco.numpy.global.numpy.PyArray_DIMS;
+import static org.bytedeco.numpy.global.numpy.PyArray_DescrNewFromType;
+import static org.bytedeco.numpy.global.numpy.PyArray_ITEMSIZE;
+import static org.bytedeco.numpy.global.numpy.PyArray_NDIM;
+import static org.bytedeco.numpy.global.numpy.PyArray_New;
+import static org.bytedeco.numpy.global.numpy.PyArray_NewFromDescr;
+import static org.bytedeco.numpy.global.numpy.PyArray_STRIDES;
+import static org.bytedeco.numpy.global.numpy.PyArray_Scalar;
+import static org.bytedeco.numpy.global.numpy.PyArray_Size;
+import static org.bytedeco.numpy.global.numpy._import_array;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.bytedeco.cpython.global.python.*;
-import static org.bytedeco.cpython.global.python.Py_DecodeLocale;
-import static org.bytedeco.cpython.helper.python.Py_AddPath;
-import static org.bytedeco.cpython.presets.python.cachePackages;
-import static org.bytedeco.embeddedpython.PyTypes.*;
-import static org.bytedeco.numpy.global.numpy.*;
+import org.bytedeco.cpython.PyCFunction;
+import org.bytedeco.cpython.PyConfig;
+import org.bytedeco.cpython.PyMethodDef;
+import org.bytedeco.cpython.PyObject;
+import org.bytedeco.cpython.PyStatus;
+import org.bytedeco.cpython.PyTypeObject;
+import org.bytedeco.cpython.PyWideStringList;
+import org.bytedeco.cpython.global.python;
+import org.bytedeco.javacpp.BooleanPointer;
+import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.CharPointer;
+import org.bytedeco.javacpp.DoublePointer;
+import org.bytedeco.javacpp.FloatPointer;
+import org.bytedeco.javacpp.IntPointer;
+import org.bytedeco.javacpp.Loader;
+import org.bytedeco.javacpp.LongPointer;
+import org.bytedeco.javacpp.Pointer;
+import org.bytedeco.javacpp.PointerScope;
+import org.bytedeco.javacpp.ShortPointer;
+import org.bytedeco.javacpp.SizeTPointer;
+import org.bytedeco.numpy.PyArrayObject;
+import org.bytedeco.numpy.PyArray_DatetimeDTypeMetaData;
+import org.bytedeco.numpy.PyArray_Descr;
+import org.bytedeco.numpy.PyBoolScalarObject;
+import org.bytedeco.numpy.PyByteScalarObject;
+import org.bytedeco.numpy.PyDatetimeScalarObject;
+import org.bytedeco.numpy.PyDoubleScalarObject;
+import org.bytedeco.numpy.PyFloatScalarObject;
+import org.bytedeco.numpy.PyIntScalarObject;
+import org.bytedeco.numpy.PyLongScalarObject;
+import org.bytedeco.numpy.PyShortScalarObject;
+import org.bytedeco.numpy.PyUShortScalarObject;
 
 /**
  * Python interpreter.
@@ -33,37 +162,75 @@ import static org.bytedeco.numpy.global.numpy.*;
  * This class is thread-safe. All the methods are synchronized.
  */
 public class Python {
+    private static final PyObject MAIN_MODULE;
+    private static final PyObject GLOBALS;
     static {
         try {
             init();
         } catch (Exception e) {
             throw new PythonException("Failed at Python.init()", e);
         }
+        MAIN_MODULE = PyImport_AddModule("__main__");
+        if (MAIN_MODULE == null) { // don't kill the entire JVM
+            throw new PythonException("Failed to load __main__");
+        }
+        GLOBALS = PyModule_GetDict(MAIN_MODULE);
     }
 
     private static void init() throws IOException {
         System.setProperty("org.bytedeco.openblas.load", "mkl");
 
-        Py_AddPath(cachePackages());
-        Py_AddPath(org.bytedeco.numpy.presets.numpy.cachePackages());
+        List<File> moduleSearchPaths = new ArrayList<>();
 
-        String javaCppVersion = Loader.getVersion();
-        if (javaCppVersion.equals("1.5.3") || javaCppVersion.equals("1.5.4")) {
-            Py_AddPath(new File(cachePackages()[0], "site-packages"));
+        Collections.addAll(moduleSearchPaths, cachePackages());
+        Collections.addAll(moduleSearchPaths, org.bytedeco.numpy.presets.numpy.cachePackages());
+
+        String pythonPath = Loader.load(org.bytedeco.cpython.python.class);
+
+        try (PyConfig config = new PyConfig(); //
+                PointerScope scope = new PointerScope()) {
+            // See
+            // https://docs.python.org/3.12/c-api/init_config.html#c.Py_InitializeFromConfig
+            // and https://docs.python.org/3.12/c-api/init.html#c.Py_SetPath
+
+            PyConfig_InitPythonConfig(config);
+            requireNoException(PyConfig_Read(config));
+
+            PyWideStringList modulePaths = config.module_search_paths();
+            for (File packageLocation : moduleSearchPaths) {
+                Pointer path = toWcharTPointer(packageLocation.getPath());
+                requireNoException(PyWideStringList_Append(modulePaths, path));
+            }
+            config.module_search_paths_set(1);
+
+            PyWideStringList argv = config.argv();
+            Pointer emptyString = toWcharTPointer("");
+            requireNoException(PyWideStringList_Append(argv, emptyString));
+
+            config.executable(toWcharTPointer(pythonPath));
+            config.buffered_stdio(1);
+
+            requireNoException(Py_InitializeFromConfig(config));
+            PyConfig_Clear(config);
         }
-
-        _Py_SetProgramFullPath(Py_DecodeLocale(Loader.load(org.bytedeco.cpython.python.class), null));
-
-        Py_UnbufferedStdioFlag(1);
-        Py_Initialize();
-        PySys_SetArgvEx(1, new PointerPointer<>(1).put(Py_DecodeLocale("", null)), 0);
         _import_array();
 
         Runtime.getRuntime().addShutdownHook(new Thread(python::Py_Finalize));
     }
 
-    private static final PyObject mainModule = PyImport_AddModule("__main__");
-    private static final PyObject globals = PyModule_GetDict(mainModule);
+    private static Pointer toWcharTPointer(String string) {
+        Pointer decodedString = Py_DecodeLocale(string, null);
+        if (!Pointer.isNull(decodedString)) {
+            PointerScope.getInnerScope().attach(decodedString);
+        }
+        return decodedString;
+    }
+
+    private static void requireNoException(PyStatus status) {
+        if (python.PyStatus_Exception(status) != 0) {
+            throw new IllegalStateException();
+        }
+    }
 
     private Python() {
     }
@@ -93,7 +260,7 @@ public class Python {
     public synchronized static <T> T eval(String src) {
         PyObject co = compile(src);
         try {
-            PyObject obj = PyEval_EvalCode(co, globals, globals);
+            PyObject obj = PyEval_EvalCode(co, GLOBALS, GLOBALS);
             try {
                 if (obj == null) {
                     if (PyErr_Occurred() != null) {
@@ -174,7 +341,7 @@ public class Python {
     }
 
     private static PyObject getPyObject(String name) {
-        PyObject obj = PyDict_GetItemString(globals, name);
+        PyObject obj = PyDict_GetItemString(GLOBALS, name);
         if (obj == null) throw new NoSuchElementException("name = " + name);
         return obj;
     }
@@ -234,7 +401,7 @@ public class Python {
 
     private static void putPyObject(String name, PyObject obj) {
         try {
-            if (PyDict_SetItemString(globals, name, obj) != 0) {
+            if (PyDict_SetItemString(GLOBALS, name, obj) != 0) {
                 throw new PythonException("PyDict_SetItemString() failed");
             }
         } finally {
@@ -948,7 +1115,7 @@ public class Python {
                 ml_name(new BytePointer("org.bytedeco.embeddedpython")).
                 ml_meth(pyFunc).
                 ml_flags(METH_VARARGS);
-        return PyCFunction_NewEx(methodDef, null, mainModule);
+        return PyCFunction_NewEx(methodDef, null, MAIN_MODULE);
     }
 
     private static long[] toLongArray(int[] intAry) {
